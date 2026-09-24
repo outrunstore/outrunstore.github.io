@@ -99,7 +99,7 @@ h2{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size
 .sw{width:16px;height:16px;border-radius:50%;border:1px solid var(--line)}
 
 .ask{padding-block:8px 40px}
-.ask-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:18px}
+.ask-grid{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;align-items:start}
 .ask-card{border-radius:6px;padding:26px 24px;display:flex;flex-direction:column;gap:12px;align-items:flex-start}
 .ask-card h2{font-size:clamp(30px,4.5vw,44px)}
 .ask-card p{margin:0;max-width:48ch}
@@ -110,6 +110,26 @@ h2{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size
 .ask-side p{color:var(--muted)}
 .handle{font-family:var(--mono);font-weight:700}
 @media (max-width:820px){.ask-grid{grid-template-columns:1fr}}
+.ask-btns{display:flex;flex-wrap:wrap;gap:10px}
+.req{display:flex;flex-direction:column;gap:12px;width:100%}
+.req-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.req-field{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600}
+.req-field input,.req-field textarea,.req-field select{font:inherit;font-size:15px;font-weight:400;color:var(--ink);background:var(--card);border:1.5px solid transparent;border-radius:8px;padding:10px 12px;width:100%}
+.req-field textarea{resize:vertical;min-height:84px}
+.req-field input:focus,.req-field textarea:focus,.req-field select:focus{outline:none;border-color:var(--ink)}
+.req-file{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.req-pick{align-self:flex-start;border:1.5px dashed currentColor;border-radius:8px;padding:10px 14px;cursor:pointer;font-weight:700}
+.req-file:focus-visible + .req-thumbs, .req-pick:hover{opacity:.85}
+.req-thumbs{display:flex;gap:8px;flex-wrap:wrap}
+.req-thumb{position:relative;width:68px;height:68px;border-radius:8px;overflow:hidden;background:var(--card)}
+.req-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.req-thumb button{position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:50%;border:0;background:var(--ink);color:var(--bg);font-size:13px;line-height:1}
+.ask-main .req-submit{align-self:flex-start;padding:13px 22px;font-size:15px}
+.req-note{font-size:13px;opacity:.85}
+.req-honey{position:absolute;left:-9999px}
+.req-done{background:var(--accent-ink);color:var(--accent);border-radius:8px;padding:12px 14px;font-size:15px}
+@media (max-width:520px){.req-row{grid-template-columns:1fr}}
+
 /* info blocks */
 .info-sec{padding-block:32px 48px;display:grid;grid-template-columns:1fr 1fr;gap:32px;border-top:1px solid var(--line)}
 .info-sec h2{font-size:clamp(30px,4.5vw,42px);margin-bottom:14px}
@@ -139,6 +159,7 @@ footer .logo{font-size:22px;color:var(--ink)}
 .label{font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-bottom:6px}
 .opts{display:flex;gap:8px;flex-wrap:wrap}
 .opt{border:1.5px solid var(--line);background:var(--card);border-radius:6px;padding:8px 12px;font-weight:600;font-size:14px;min-width:46px}
+.opt.static{cursor:default;background:transparent}
 .opt[aria-pressed="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
 .opt .sw{display:inline-block;vertical-align:-3px;margin-right:6px}
 .code{font-family:var(--mono);font-size:13px;background:var(--card);border:1px dashed var(--line);border-radius:6px;padding:10px 12px;user-select:all;word-break:break-word}
@@ -146,7 +167,7 @@ footer .logo{font-size:22px;color:var(--ink)}
 .order-actions .snap-btn{justify-content:center;padding:14px 18px;font-size:15px}
 .copy-btn{border:1.5px solid var(--ink);background:transparent;border-radius:999px;padding:11px 16px;font-weight:700;font-size:14px}
 .hint{font-size:13px;color:var(--muted);margin:0}
-.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;font-weight:600;z-index:60}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));white-space:nowrap;max-width:calc(100vw - 32px);overflow:hidden;text-overflow:ellipsis;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-size:14px;font-weight:600;z-index:60}
 
 @media (max-width:820px){
   .info-sec{grid-template-columns:1fr}
@@ -191,6 +212,7 @@ footer .logo{font-size:22px;color:var(--ink)}
         <div class="hero-actions">
           <a href="#shop" class="snap-btn">Bekijk de collectie</a>
           <a href="#info" class="ghost-btn">Hoe bestellen?</a>
+          <button type="button" class="ghost-btn" data-open-chat>Vraag de chatbot</button>
         </div>
       </div>
     </div>
@@ -198,8 +220,8 @@ footer .logo{font-size:22px;color:var(--ink)}
 
   <div class="wrap">
     <div class="steps" aria-label="Zo bestel je">
-      <div class="step"><b>1</b><div><h3>Kies product en maat</h3><p>Tik op een item en kies je kleur en maat.</p></div></div>
-      <div class="step"><b>2</b><div><h3>Stuur de code via Snap</h3><p>Je bestelcode wordt gekopieerd. Plak hem in de chat met <span class="snapname"></span>.</p></div></div>
+      <div class="step"><b>1</b><div><h3>Check de collectie</h3><p>Kijk rond en kies wat je wilt hebben.</p></div></div>
+      <div class="step"><b>2</b><div><h3>Snap ons</h3><p>Stuur een snap naar <span class="snapname"></span> met het item, je kleur en maat.</p></div></div>
       <div class="step"><b>3</b><div><h3>Betaal en ontvang</h3><p>Je krijgt een Tikkie en je bestelling ligt binnen 1-2 werkdagen bij je.</p></div></div>
     </div>
   </div>
@@ -219,14 +241,51 @@ footer .logo{font-size:22px;color:var(--ink)}
       <div class="ask-card ask-main">
         <div class="eyebrow">Niet gevonden wat je zoekt?</div>
         <h2>Doe een aanvraag</h2>
-        <p>Zoek je een bepaald item, een andere kleur of een stijl die er niet tussen staat? Stuur ons een foto of omschrijving via Snap. Wij zoeken het voor je en laten weten wat het kost.</p>
-        <a class="snap-btn snaplink" href="#" target="_blank" rel="noopener">Stuur je aanvraag via Snap</a>
+        <p>Zoek je een item, kleur of stijl die er niet tussen staat? Omschrijf het en stuur er een foto bij. Wij zoeken het voor je en laten je weten wat het kost.</p>
+        <div class="req-done" id="reqDone" hidden>
+          <strong>Aanvraag binnen!</strong> We gaan ermee aan de slag en snappen je zo snel mogelijk terug.
+        </div>
+        <form class="req" id="reqForm" method="POST" enctype="multipart/form-data">
+          <input type="hidden" name="_subject" value="Nieuwe aanvraag via de OUTRUN-site">
+          <input type="hidden" name="_template" value="table">
+          <input type="hidden" name="_next" id="reqNext" value="">
+          <input type="text" name="_honey" class="req-honey" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <div class="req-row">
+            <label class="req-field"><span>Naam</span><input id="reqName" name="Naam" type="text" required autocomplete="given-name" placeholder="Je voornaam"></label>
+            <label class="req-field"><span>Snapchat-naam</span><input id="reqSnap" name="Snapchat" type="text" required placeholder="Zodat we je kunnen terugsnappen"></label>
+          </div>
+          <label class="req-field"><span>Wat zoek je?</span><textarea id="reqText" name="Aanvraag" rows="3" required placeholder="Bijv. een zwarte puffer met capuchon, oversized"></textarea></label>
+          <div class="req-row">
+            <label class="req-field"><span>Maat</span>
+              <select id="reqSize" name="Maat">
+                <option value="">Weet ik nog niet</option>
+                <option>S</option><option>M</option><option>L</option><option>XL</option>
+                <option>Schoenmaat 40</option><option>Schoenmaat 41</option><option>Schoenmaat 42</option><option>Schoenmaat 43</option><option>Schoenmaat 44</option><option>Schoenmaat 45</option>
+                <option>One size</option>
+              </select>
+            </label>
+            <label class="req-field"><span>Budget (optioneel)</span><input id="reqBudget" name="Budget" type="text" placeholder="Bijv. €60"></label>
+          </div>
+          <div class="req-field">
+            <span>Foto's (optioneel, max 3)</span>
+            <label class="req-pick" for="reqPick">+ Foto's toevoegen</label>
+            <input id="reqPick" type="file" accept="image/*" multiple class="req-file">
+            <div class="req-thumbs" id="reqThumbs"></div>
+            <div id="reqFiles" hidden></div>
+          </div>
+          <button class="snap-btn req-submit" type="submit" id="reqSubmit">Verstuur aanvraag</button>
+          <p class="req-note">Liever via Snap? Stuur je foto naar <strong class="snapname"></strong>.</p>
+        </form>
       </div>
       <div class="ask-card ask-side">
         <div class="eyebrow">Vragen?</div>
-        <h2>Snap ons</h2>
-        <p>Over maten, levering, ophalen of je bestelling: stuur een bericht naar <span class="handle snapname"></span>.</p>
-        <a class="ghost-btn snaplink" href="#" target="_blank" rel="noopener">Open Snapchat</a>
+        <h2>Snap, mail of chat</h2>
+        <p>Over maten, levering, ophalen of je bestelling: snap <span class="handle snapname"></span> of mail naar <span class="handle mailaddr"></span>. Of vraag het meteen aan onze chatbot, die is 24/7 online.</p>
+        <div class="ask-btns">
+          <button class="snap-btn" type="button" data-open-chat>Chat met de bot</button>
+          <a class="ghost-btn snaplink" href="#" target="_blank" rel="noopener">Open Snapchat</a>
+          <a class="ghost-btn" id="mailLink" href="#">Mail ons</a>
+        </div>
       </div>
     </div>
   </section>
@@ -250,8 +309,8 @@ footer .logo{font-size:22px;color:var(--ink)}
       </div>
       <div id="info">
         <h2>Info</h2>
-        <details open><summary>Hoe bestel ik?</summary><p>Kies een product, kleur en maat en tik op de Snap-knop. Je bestelcode wordt gekopieerd. Plak die in de chat, dan checken we de voorraad en sturen je een betaalverzoek.</p></details>
-        <details><summary>Kan ik iets aanvragen?</summary><p>Ja. Stuur een foto of omschrijving van wat je zoekt naar <span class="snapname"></span> op Snapchat. We zoeken het voor je en sturen je de prijs en levertijd.</p></details>
+        <details open><summary>Hoe bestel ik?</summary><p>Bestellen gaat via Snapchat. Stuur een snap naar <span class="snapname"></span> met het item, je kleur en maat. Wij checken de voorraad en sturen je een Tikkie.</p></details>
+        <details><summary>Kan ik iets aanvragen?</summary><p>Ja. Vul het <a href="#aanvragen">aanvraagformulier</a> in met een omschrijving en eventueel foto's, of snap <span class="snapname"></span>. We zoeken het voor je en laten je de prijs en levertijd weten.</p></details>
         <details><summary>Betalen</summary><p>Via een Tikkie (iDEAL) nadat we je bestelling hebben bevestigd. We versturen pas als er betaald is. Betaal je niet binnen 24 uur, dan vervalt je reservering.</p></details>
         <details><summary>Verzenden en ophalen</summary><p>We versturen door heel Nederland met PostNL en track &amp; trace, binnen 1-2 werkdagen na betaling. Woon je in de omgeving Leiden? Dan kun je je bestelling ook ophalen. Vraag het ons via Snap.</p></details>
       </div>
@@ -262,7 +321,7 @@ footer .logo{font-size:22px;color:var(--ink)}
 <footer>
   <div class="wrap">
     <div><span class="logo">OUT<span style="color:var(--accent)">RUN</span></span><br>Streetwear · verzending door heel Nederland</div>
-    <div>Snapchat: <strong class="snapname"></strong><br>KvK: <span id="kvk"></span></div>
+    <div>Snapchat: <strong class="snapname"></strong><br>Mail: <strong class="mailaddr"></strong><br>KvK: <span id="kvk"></span></div>
   </div>
 </footer>
 
@@ -276,14 +335,13 @@ footer .logo{font-size:22px;color:var(--ink)}
         <h3 id="sheetTitle"></h3>
         <div class="price" id="sheetPrice" style="font-size:20px;margin-top:6px"></div>
       </div>
-      <div><div class="label">Kleur</div><div class="opts" id="colorOpts"></div></div>
-      <div><div class="label">Maat</div><div class="opts" id="sizeOpts"></div></div>
-      <div><div class="label">Jouw bestelcode</div><div class="code" id="orderCode"></div></div>
+      <p class="hint" id="sheetNote" style="font-size:15px"></p>
+      <div><div class="label">Kleuren</div><div class="opts" id="colorOpts"></div></div>
+      <div><div class="label">Beschikbare maten</div><div class="opts" id="sizeOpts"></div></div>
       <div class="order-actions">
-        <a class="snap-btn" id="orderSnap" href="#" target="_blank" rel="noopener"></a>
-        <button class="copy-btn" id="copyBtn" type="button">Alleen code kopiëren</button>
+        <a class="snap-btn snaplink" id="orderSnap" href="#" target="_blank" rel="noopener">Snap ons voor dit item</a>
       </div>
-      <p class="hint">Snapchat niet geopend? Zoek <strong class="snapname"></strong> in de app en plak je code in de chat.</p>
+      <p class="hint">Bestellen gaat via Snapchat. Stuur een snap naar <strong class="snapname"></strong> met dit item, je kleur en maat.</p>
     </div>
   </div>
 </div>
@@ -296,7 +354,9 @@ const CONFIG = {
   snapUsername: "outrun.store",   // je Snapchat-gebruikersnaam
   dropName: "Drop 01",
   dropLive: false,                // false = reserveren, true = drop is live
-  kvk: "volgt"                    // je KvK-nummer
+  kvk: "volgt",
+  email: "outrun.store22@gmail.com", // aanvragen + contact
+  siteUrl: "https://stoertjeomar.github.io/outrun/"                    // je KvK-nummer
 };
 
 /* Producten: prijs in euro's */
@@ -343,13 +403,14 @@ function garment(shape, fill){
 }
 
 /* ticker + static text */
-const tick = [`${CONFIG.dropName} ${CONFIG.dropLive ? "is live" : "komt eraan"}`, "Verzending door heel NL", "Bestellen via Snapchat", `Vragen of aanvragen? Snap ${CONFIG.snapUsername}`, "Op is op", "Verzending binnen 1-2 werkdagen"];
+const tick = [`${CONFIG.dropName} ${CONFIG.dropLive ? "is live" : "komt eraan"}`, "Verzending door heel NL", "Bestellen via Snapchat", `Vragen of aanvragen? Snap ${CONFIG.snapUsername}`, "Vragen? Chat met onze bot, 24/7 online", "Op is op", "Verzending binnen 1-2 werkdagen"];
 document.getElementById("ticker").innerHTML = [...tick, ...tick, ...tick, ...tick].map(t => `<span>${t} ✦</span>`).join("");
 document.querySelectorAll(".snapname").forEach(el => el.textContent = CONFIG.snapUsername);
 document.getElementById("kvk").textContent = CONFIG.kvk;
+document.querySelectorAll(".mailaddr").forEach(el => el.textContent = CONFIG.email);
 document.getElementById("topSnap").href = snapUrl;
 document.querySelectorAll(".snaplink").forEach(a => a.href = snapUrl);
-document.getElementById("dropStatus").textContent = CONFIG.dropLive ? `${CONFIG.dropName} is live` : `${CONFIG.dropName} · binnenkort · reserveer nu`;
+document.getElementById("dropStatus").textContent = CONFIG.dropLive ? `${CONFIG.dropName} is live` : `${CONFIG.dropName} · binnenkort · snap ons om te reserveren`;
 document.getElementById("shopTitle").textContent = CONFIG.dropName;
 
 /* filters + grid */
@@ -380,52 +441,80 @@ renderFilters(); renderGrid();
 
 /* sheet */
 const overlay = document.getElementById("overlay");
-let cur = null, color = 0, size = null, lastFocus = null;
+let cur = null, color = 0, lastFocus = null;
 function openSheet(id){
-  cur = PRODUCTS.find(p => p.id===id); color = 0; size = cur.sizes.length===1 ? cur.sizes[0] : null;
+  cur = PRODUCTS.find(p => p.id===id); color = 0;
   lastFocus = document.activeElement;
   document.getElementById("sheetCat").textContent = cur.cat;
   document.getElementById("sheetTitle").textContent = cur.name;
   document.getElementById("sheetPrice").textContent = euro(cur.price);
+  document.getElementById("sheetNote").textContent = cur.note;
   renderSheet(); overlay.hidden = false; document.body.style.overflow = "hidden";
   document.getElementById("closeBtn").focus();
 }
 function closeSheet(){ overlay.hidden = true; document.body.style.overflow = ""; if(lastFocus) lastFocus.focus(); }
-function code(){
-  return `OUTRUN · ${cur.name} · ${cur.colors[color][0]} · Maat ${size ?? "?"} · ${euro(cur.price)}`;
-}
 function renderSheet(){
   document.getElementById("sheetTile").innerHTML = garment(cur.shape, cur.colors[color][1]);
   document.getElementById("colorOpts").innerHTML = cur.colors.map((c,i) =>
     `<button class="opt" data-color="${i}" aria-pressed="${i===color}"><span class="sw" style="background:${c[1]}"></span>${c[0]}</button>`).join("");
-  document.getElementById("sizeOpts").innerHTML = cur.sizes.map(s =>
-    `<button class="opt" data-size="${s}" aria-pressed="${s===size}">${s}</button>`).join("");
-  document.getElementById("orderCode").textContent = size ? code() : "Kies eerst je maat";
-  const btn = document.getElementById("orderSnap");
-  btn.textContent = CONFIG.dropLive ? "Bestel via Snapchat" : "Reserveer via Snapchat";
-  btn.href = snapUrl;
-  btn.style.opacity = size ? 1 : .5;
+  document.getElementById("sizeOpts").innerHTML = cur.sizes.map(s => `<span class="opt static">${s}</span>`).join("");
 }
 document.getElementById("colorOpts").addEventListener("click", e => { const b=e.target.closest("[data-color]"); if(b){color=+b.dataset.color; renderSheet();} });
-document.getElementById("sizeOpts").addEventListener("click", e => { const b=e.target.closest("[data-size]"); if(b){size=b.dataset.size; renderSheet();} });
 document.getElementById("closeBtn").addEventListener("click", closeSheet);
 overlay.addEventListener("click", e => { if(e.target===overlay) closeSheet(); });
 document.addEventListener("keydown", e => { if(e.key==="Escape" && !overlay.hidden) closeSheet(); });
 
 const toastEl = document.getElementById("toast"); let tt;
-function toast(msg){ toastEl.textContent = msg; toastEl.hidden = false; clearTimeout(tt); tt = setTimeout(() => toastEl.hidden = true, 2600); }
-async function copyCode(){
-  try { await navigator.clipboard.writeText(code()); return true; }
-  catch { const r = document.createRange(); r.selectNodeContents(document.getElementById("orderCode")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); return false; }
-}
-document.getElementById("orderSnap").addEventListener("click", e => {
-  if(!size){ e.preventDefault(); toast("Kies eerst je maat"); return; }
-  copyCode().then(ok => toast(ok ? "Code gekopieerd. Plak hem in de Snap-chat." : "Code geselecteerd. Kopieer hem en plak in de chat."));
-});
-document.getElementById("copyBtn").addEventListener("click", () => {
-  if(!size){ toast("Kies eerst je maat"); return; }
-  copyCode().then(ok => toast(ok ? "Code gekopieerd" : "Code geselecteerd. Kopieer hem handmatig."));
-});
+function toast(msg, ms){ toastEl.textContent = msg; toastEl.hidden = false; clearTimeout(tt); tt = setTimeout(() => toastEl.hidden = true, ms || 2600); }
+
+/* aanvraagformulier */
+(() => {
+  const form = document.getElementById("reqForm");
+  form.action = "https://formsubmit.co/" + CONFIG.email;
+  document.getElementById("reqNext").value = CONFIG.siteUrl + "#bedankt";
+  const mail = document.getElementById("mailLink");
+  mail.href = "mailto:" + CONFIG.email + "?subject=" + encodeURIComponent("Vraag via OUTRUN-site");
+  const pick = document.getElementById("reqPick"), thumbs = document.getElementById("reqThumbs"), filesEl = document.getElementById("reqFiles");
+  const MAX = 3, MAX_MB = 5;
+  let files = [];
+  function render(){
+    thumbs.innerHTML = "";
+    files.forEach((f,i) => {
+      const d = document.createElement("div"); d.className = "req-thumb";
+      const img = document.createElement("img"); img.alt = f.name; img.src = URL.createObjectURL(f);
+      const x = document.createElement("button"); x.type = "button"; x.textContent = "×"; x.setAttribute("aria-label","Verwijder " + f.name);
+      x.onclick = () => { files.splice(i,1); render(); };
+      d.append(img, x); thumbs.append(d);
+    });
+  }
+  pick.addEventListener("change", () => {
+    for (const f of pick.files){
+      if (!f.type.startsWith("image/")) continue;
+      if (f.size > MAX_MB*1024*1024){ toast(`${f.name} is groter dan ${MAX_MB} MB`); continue; }
+      if (files.length >= MAX){ toast(`Maximaal ${MAX} foto's`); break; }
+      files.push(f);
+    }
+    pick.value = ""; render();
+  });
+  form.addEventListener("submit", e => {
+    if (form.querySelector(".req-honey").value){ e.preventDefault(); return; }
+    filesEl.innerHTML = "";
+    try {
+      files.forEach((f,i) => {
+        const dt = new DataTransfer(); dt.items.add(f);
+        const inp = document.createElement("input"); inp.type = "file"; inp.name = "Foto " + (i+1); inp.files = dt.files;
+        filesEl.append(inp);
+      });
+    } catch(err){ /* oude browser: verstuur zonder foto's */ }
+    const btn = document.getElementById("reqSubmit"); btn.textContent = "Versturen…"; btn.disabled = true;
+  });
+  if (location.hash === "#bedankt"){
+    document.getElementById("reqDone").hidden = false;
+    form.hidden = true;
+    setTimeout(() => document.getElementById("aanvragen").scrollIntoView(), 50);
+    toast("Aanvraag verstuurd!", 4000);
+  }
+})();
 </script>
 
 <!-- ====== OUTRUN CHATBOT ====== -->
@@ -449,16 +538,24 @@ document.getElementById("copyBtn").addEventListener("click", () => {
 .cb-form input{flex:1;min-width:0;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:10px 14px;font:inherit;font-size:14px}
 .cb-form button{background:var(--accent);color:var(--accent-ink);border:0;border-radius:999px;padding:0 16px;font-weight:700}
 .cb-typing{opacity:.6;font-style:italic}
+.cb-fab .cb-live{width:8px;height:8px;border-radius:50%;background:#35D07F;box-shadow:0 0 0 3px rgba(53,208,127,.25)}
+.cb-teaser{position:fixed;right:16px;bottom:calc(76px + env(safe-area-inset-bottom,0px));z-index:40;max-width:230px;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:12px 12px 4px 12px;padding:10px 30px 10px 12px;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.18);animation:up .3s cubic-bezier(.2,.8,.2,1);cursor:pointer}
+.cb-teaser b{display:block}
+.cb-teaser button{position:absolute;top:6px;right:6px;background:transparent;border:0;color:var(--muted);font-size:15px;line-height:1}
+.cb-head .cb-status{display:flex;align-items:center;gap:6px}
+.cb-head .cb-status i{width:7px;height:7px;border-radius:50%;background:#35D07F;display:inline-block}
 </style>
 
-<button class="cb-fab" id="cbFab" type="button" aria-label="Open de OUTRUN-chat">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>
-  Vraag het ons
+<button class="cb-fab" id="cbFab" type="button" aria-label="Open de OUTRUN-chatbot">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="7" width="16" height="12" rx="3"/><path d="M12 7V4M9 12h.01M15 12h.01M9 16h6"/></svg>
+  Chat met onze bot <span class="cb-live" aria-hidden="true"></span>
 </button>
 
-<div class="cb-panel" id="cbPanel" role="dialog" aria-label="OUTRUN chat" hidden>
+<div class="cb-teaser" id="cbTeaser" hidden><b>Yo, vragen?</b>Onze chatbot helpt je 24/7 met maten, prijzen en bestellen.<button type="button" id="cbTeaserX" aria-label="Sluiten">×</button></div>
+
+<div class="cb-panel" id="cbPanel" role="dialog" aria-label="OUTRUN chatbot" hidden>
   <div class="cb-head">
-    <div><b>Outrun</b><small>Stel je vraag, we helpen je direct</small></div>
+    <div><b>Outrun Bot</b><small class="cb-status"><i></i>Chatbot · 24/7 online</small></div>
     <button class="cb-x" id="cbClose" type="button" aria-label="Chat sluiten">×</button>
   </div>
   <div class="cb-log" id="cbLog" aria-live="polite"></div>
@@ -475,7 +572,7 @@ document.getElementById("copyBtn").addEventListener("click", () => {
   const fab = $("cbFab"), panel = $("cbPanel"), log = $("cbLog"), chipsEl = $("cbChips"), form = $("cbForm"), input = $("cbInput");
   const snap = CONFIG.snapUsername;
   const snapLink = `<a href="${snapUrl}" target="_blank" rel="noopener">${snap}</a>`;
-  const DEFAULT_CHIPS = ["Welke maat past mij?", "Prijzen", "Verzending", "Ophalen", "Iets aanvragen"];
+  const DEFAULT_CHIPS = ["Welke maat past mij?", "Prijzen", "Hoe bestel ik?", "Ophalen", "Iets aanvragen"];
 
   const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
   const has = (t, words) => words.filter(w => t.includes(w)).length;
@@ -496,6 +593,7 @@ document.getElementById("copyBtn").addEventListener("click", () => {
     if (!hits.length && has(t, TRACK_WORDS)) return PRODUCTS.filter(p => p.cat === "Trainingspakken");
     return hits;
   }
+  const mail = CONFIG.email;
   const productLine = p => `• ${p.name}: ${euro(p.price)} · ${p.colors.map(c => c[0].toLowerCase()).join(", ")} · maten ${p.sizes.join(", ")}`;
 
   function sizeFor(cm){
@@ -513,11 +611,11 @@ document.getElementById("copyBtn").addEventListener("click", () => {
     const cm = (t.match(/\b(1[4-9]\d|20\d)\b/) || [])[1];
     const brand = BRANDS.find(b => t.includes(b));
 
-    if (brand) return { text: `We verkopen geen kleding van andere merken, alleen ons eigen label OUTRUN. Zoek je iets in die stijl? Stuur een foto via Snap naar ${snapLink}, dan zoeken we een OUTRUN-versie voor je.`, chips: ["Iets aanvragen", "Bekijk de collectie"] };
+    if (brand) return { text: `Andere merken verkopen we niet, bro. Alleen ons eigen label OUTRUN. Maar gooi een foto in het aanvraagformulier of snap ${snapLink}, dan zoeken we iets in dezelfde vibe.`, chips: ["Naar aanvraagformulier", "Bekijk de collectie"] };
 
     const intents = {
-      greet:   has(t, [" hoi ", " hallo ", " hey ", " hi ", " yo ", " salam", " goedemiddag", " goedemorgen", " goedenavond", " hee "]),
-      thanks:  has(t, ["bedankt", "dank je", "dankje", "thanks", "thnx", "top", "chill"]),
+      greet:   has(t, [" hoi ", " hallo ", " hey ", " hi ", " yo ", " salam", " goedemiddag", " goedemorgen", " goedenavond", " hee ", " ewa", " wollah", " wsg", " alles goed"]),
+      thanks:  has(t, ["bedankt", "dank je", "dankje", "thanks", "thnx", "top", "chill", "respect", "tof", "nice"]),
       size:    has(t, ["maat", "maten", "size", "past", "valt", "groot", "klein", "lengte", "cm", "oversized"]) + (cm ? 2 : 0),
       price:   has(t, ["prijs", "prijzen", "kost", "kosten", "hoeveel", "duur", "goedkoop", "euro"]),
       ship:    has(t, ["verzend", "verzending", "bezorg", "lever", "postnl", "opsturen", "hoe lang", "wanneer binnen", "track"]),
@@ -527,7 +625,7 @@ document.getElementById("copyBtn").addEventListener("click", () => {
       request: has(t, ["aanvraag", "aanvragen", "zoek", "andere kleur", "heb je ook", "hebben jullie ook", "kunnen jullie", "regelen", "speciaal"]),
       drop:    has(t, ["drop", "nieuw", "voorraad", "uitverkocht", "live", "binnenkort", "wanneer"]),
       returns: has(t, ["retour", "ruilen", "terugsturen", "omruilen", "geld terug"]),
-      human:   has(t, ["snap", "snapchat", "contact", "mens", "medewerker", "bellen", "whatsapp", "insta"]),
+      human:   has(t, ["snap", "snapchat", "contact", "mens", "medewerker", "bellen", "whatsapp", "insta", "mail", "email"]),
       catalog: has(t, ["collectie", "producten", "wat verkopen", "wat hebben", "aanbod", "shop"])
     };
     let best = Object.entries(intents).sort((a,b) => b[1]-a[1])[0];
@@ -536,28 +634,28 @@ document.getElementById("copyBtn").addEventListener("click", () => {
 
     switch(intent){
       case "size": {
-        if (prods.some(p => p.id === "stride")) return { text: `De Stride Low hebben we in maat ${PRODUCTS.find(p=>p.id==="stride").sizes.join(", ")}. Ze vallen normaal, dus neem je gewone schoenmaat.`, chips: ["Prijzen", "Hoe bestel ik?"] };
-        if (prods.length && prods.every(p => p.sizes.length === 1)) return { text: `${prods.map(p=>p.name).join(" en ")} is one size en past vrijwel iedereen.`, chips: ["Prijzen", "Hoe bestel ik?"] };
-        if (cm) return { text: `Met ${cm} cm raden we maat ${sizeFor(+cm)} aan voor trainingspakken en jassen. Alles valt oversized. Wil je het strakker, neem dan een maat kleiner.`, chips: ["Maattabel", "Hoe bestel ik?"] };
-        return { text: "Hoe lang ben je? Typ bijvoorbeeld \"ik ben 180\", dan geef ik je maatadvies.\n\nKort gezegd: S = 165-172 cm, M = 172-178 cm, L = 178-184 cm, XL = 184-190 cm. Alles valt oversized.", chips: ["Ik ben 175", "Ik ben 182", "Maattabel"] };
+        if (prods.some(p => p.id === "stride")) return { text: `De Stride Low hebben we in maat ${PRODUCTS.find(p=>p.id==="stride").sizes.join(", ")}. Valt normaal, dus pak gewoon je eigen maat.`, chips: ["Prijzen", "Hoe bestel ik?"] };
+        if (prods.length && prods.every(p => p.sizes.length === 1)) return { text: `${prods.map(p=>p.name).join(" en ")} is one size, past iedereen.`, chips: ["Prijzen", "Hoe bestel ik?"] };
+        if (cm) return { text: `Met ${cm} cm zit je goed in maat ${sizeFor(+cm)}. Alles valt oversized, dus wil je 'm strakker? Pak een maatje kleiner.`, chips: ["Maattabel", "Hoe bestel ik?"] };
+        return { text: "Hoe lang ben je? Typ bijv. \"ik ben 180\", dan fix ik je maat.\n\nS = 165-172 cm\nM = 172-178 cm\nL = 178-184 cm\nXL = 184-190 cm\n\nAlles valt oversized.", chips: ["Ik ben 175", "Ik ben 182", "Maattabel"] };
       }
       case "price":
       case "product":
       case "catalog": {
         const list = prods.length ? prods : PRODUCTS;
-        return { text: (prods.length ? "" : `Dit zit in ${CONFIG.dropName}:\n`) + list.map(productLine).join("\n") + "\n\nTik op een product in de shop om je kleur en maat te kiezen.", chips: ["Welke maat past mij?", "Hoe bestel ik?", "Bekijk de collectie"] };
+        return { text: (prods.length ? "" : `Dit zit er in ${CONFIG.dropName}:\n`) + list.map(productLine).join("\n") + `\n\nWil je iets hebben? Snap ${snapLink} met je item, kleur en maat.`, chips: ["Welke maat past mij?", "Hoe bestel ik?", "Bekijk de collectie"] };
       }
-      case "ship":   return { text: "We versturen door heel Nederland met PostNL en track & trace, binnen 1-2 werkdagen na betaling.", chips: ["Ophalen", "Betalen", "Hoe bestel ik?"] };
-      case "pickup": return { text: `Woon je in de omgeving Leiden? Dan kun je je bestelling ook ophalen. Spreek een tijd en plek af via Snap: ${snapLink}.`, chips: ["Hoe bestel ik?", "Verzending"] };
-      case "pay":    return { text: "Je betaalt met een Tikkie (iDEAL) nadat we je bestelling hebben bevestigd. We versturen pas als er betaald is. Betaal je niet binnen 24 uur, dan vervalt je reservering.", chips: ["Hoe bestel ik?", "Verzending"] };
-      case "order":  return { text: `Zo werkt het:\n1. Tik op een product en kies kleur en maat.\n2. Tik op de Snapchat-knop. Je bestelcode wordt gekopieerd.\n3. Plak de code in de chat met ${snapLink}.\n4. Je krijgt een Tikkie. Na betaling versturen we binnen 1-2 werkdagen.`, chips: ["Bekijk de collectie", "Betalen", "Welke maat past mij?"] };
-      case "request":return { text: `Staat het er niet tussen? Stuur een foto of omschrijving naar ${snapLink}. We zoeken het voor je en sturen je de prijs en levertijd.`, chips: ["Bekijk de collectie", "Prijzen"] };
-      case "drop":   return { text: CONFIG.dropLive ? `${CONFIG.dropName} is nu live. Op is op, dus wees er snel bij.` : `${CONFIG.dropName} komt eraan. Je kunt nu al reserveren via de shop. Volg ${snapLink} voor de datum.`, chips: ["Bekijk de collectie", "Hoe bestel ik?"] };
-      case "returns":return { text: `Wil je iets ruilen of terugsturen? Stuur ons een snap via ${snapLink}, dan kijken we het samen na.`, chips: ["Hoe bestel ik?", "Welke maat past mij?"] };
-      case "human":  return { text: `Je kunt ons altijd direct snappen: ${snapLink}.`, chips: ["Hoe bestel ik?", "Iets aanvragen"] };
-      case "thanks": return { text: "Graag gedaan! Nog iets anders?", chips: DEFAULT_CHIPS };
-      case "greet":  return { text: "Hey! Waar kan ik je mee helpen?", chips: DEFAULT_CHIPS };
-      default:       return { text: `Daar heb ik niet meteen een antwoord op. Stuur je vraag via Snap naar ${snapLink}, dan helpen we je persoonlijk.`, chips: DEFAULT_CHIPS };
+      case "ship":   return { text: "We sturen door heel NL met PostNL + track & trace. Binnen 1-2 werkdagen na betaling heb je 't binnen.", chips: ["Ophalen", "Betalen", "Hoe bestel ik?"] };
+      case "pickup": return { text: `Zit je in de buurt van Leiden? Dan kun je 't ook gewoon ophalen. Snap ${snapLink} ff om een tijd en plek te regelen.`, chips: ["Hoe bestel ik?", "Verzending"] };
+      case "pay":    return { text: "Betalen gaat via Tikkie. Eerst betalen, dan sturen we 't op. Binnen 24 uur niet betaald? Dan gaat je item terug in de voorraad.", chips: ["Hoe bestel ik?", "Verzending"] };
+      case "order":  return { text: `Bestellen gaat simpel via Snap:\n1. Check de collectie.\n2. Stuur een snap naar ${snapLink} met je item, kleur en maat.\n3. Je krijgt een Tikkie. Na betaling ligt 't binnen 1-2 werkdagen bij je.`, chips: ["Bekijk de collectie", "Betalen", "Welke maat past mij?"] };
+      case "request":return { text: `Staat 't er niet tussen? Vul het aanvraagformulier in, met foto erbij als je hebt. Wij zoeken 't voor je en laten je de prijs weten. Of snap ${snapLink}.`, chips: ["Naar aanvraagformulier", "Prijzen"] };
+      case "drop":   return { text: CONFIG.dropLive ? `${CONFIG.dropName} is live! Op is op, dus wees er fissa bij.` : `${CONFIG.dropName} komt eraan. Wil je al iets reserveren? Snap ${snapLink}. Volg ons ook voor de datum.`, chips: ["Bekijk de collectie", "Hoe bestel ik?"] };
+      case "returns":return { text: `Wil je iets ruilen of terugsturen? Snap ${snapLink} ff, dan fixen we 't samen.`, chips: ["Hoe bestel ik?", "Welke maat past mij?"] };
+      case "human":  return { text: `Snap ons direct: ${snapLink}. Of mail naar ${mail}.`, chips: ["Hoe bestel ik?", "Iets aanvragen"] };
+      case "thanks": return { text: "Geen probleem, bro! Nog iets?", chips: DEFAULT_CHIPS };
+      case "greet":  return { text: "Yo! Alles goed? Waar kan ik je mee helpen?", chips: DEFAULT_CHIPS };
+      default:       return { text: `Hmm, daar heb ik geen antwoord op. Snap ${snapLink} ff, dan helpen we je persoonlijk.`, chips: DEFAULT_CHIPS };
     }
   }
 
@@ -572,6 +670,7 @@ document.getElementById("copyBtn").addEventListener("click", () => {
   function ask(q){
     q = q.trim(); if (!q) return;
     if (q === "Bekijk de collectie"){ add(esc(q), "user"); close(); document.getElementById("shop").scrollIntoView({behavior:"smooth"}); return; }
+    if (q === "Naar aanvraagformulier"){ add(esc(q), "user"); close(); document.getElementById("aanvragen").scrollIntoView({behavior:"smooth"}); return; }
     if (q === "Maattabel"){ add(esc(q), "user"); close(); document.getElementById("maten").scrollIntoView({behavior:"smooth"}); return; }
     add(esc(q), "user"); setChips([]);
     const typing = add("…", "bot"); typing.classList.add("cb-typing");
@@ -581,14 +680,19 @@ document.getElementById("copyBtn").addEventListener("click", () => {
   }
 
   let started = false;
+  const teaser = $("cbTeaser");
   function open(){
-    panel.hidden = false; fab.hidden = true;
-    if (!started){ started = true; add(`Hey! Ik ben de OUTRUN-assistent. Vraag me alles over maten, prijzen, verzending of bestellen.`, "bot"); setChips(DEFAULT_CHIPS); }
+    panel.hidden = false; fab.hidden = true; teaser.hidden = true;
+    if (!started){ started = true; add(`Yo! Ik ben de OUTRUN-bot. Vraag me alles over maten, prijzen, verzending of aanvragen.`, "bot"); setChips(DEFAULT_CHIPS); }
     input.focus();
   }
   function close(){ panel.hidden = true; fab.hidden = false; fab.focus(); }
 
   fab.addEventListener("click", open);
+  window.openChat = open;
+  document.querySelectorAll("[data-open-chat]").forEach(b => b.addEventListener("click", open));
+  teaser.addEventListener("click", e => { if (e.target.id === "cbTeaserX"){ teaser.hidden = true; return; } open(); });
+  setTimeout(() => { if (!started && panel.hidden) teaser.hidden = false; }, 3500);
   $("cbClose").addEventListener("click", close);
   chipsEl.addEventListener("click", e => { const b = e.target.closest(".cb-chip"); if (b) ask(b.textContent); });
   form.addEventListener("submit", e => { e.preventDefault(); ask(input.value); input.value = ""; });
