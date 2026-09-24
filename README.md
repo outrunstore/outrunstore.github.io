@@ -11,4 +11,4 @@ Alles zit in `index.html`. Onderaan in het `<script>`-blok staan:
 
 ## Online
 
-De site draait op GitHub Pages (Settings → Pages → branch `main`, map `/ (root)`).
+De site draait op GitHub Pages: https://outrunstore.github.io
