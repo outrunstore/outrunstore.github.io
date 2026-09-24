@@ -428,5 +428,174 @@ document.getElementById("copyBtn").addEventListener("click", () => {
 });
 </script>
 
+<!-- ====== OUTRUN CHATBOT ====== -->
+<style>
+.cb-fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:40;display:flex;align-items:center;gap:8px;background:var(--ink);color:var(--bg);border:0;border-radius:999px;padding:12px 18px 12px 14px;font-weight:700;font-size:14px;box-shadow:0 6px 24px rgba(0,0,0,.25)}
+.cb-fab svg{width:20px;height:20px}
+.cb-panel{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:45;width:min(380px,calc(100vw - 32px));height:min(560px,calc(100vh - 110px));background:var(--bg);border:1px solid var(--line);border-radius:14px;box-shadow:0 16px 48px rgba(0,0,0,.3);display:flex;flex-direction:column;overflow:hidden;animation:up .25s cubic-bezier(.2,.8,.2,1)}
+.cb-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;background:var(--accent);color:var(--accent-ink)}
+.cb-head b{font-family:var(--display);font-size:22px;font-style:italic;letter-spacing:.02em;text-transform:uppercase}
+.cb-head small{display:block;font-size:12px;opacity:.85}
+.cb-x{background:transparent;border:1.5px solid currentColor;color:inherit;border-radius:999px;width:30px;height:30px;line-height:1;font-size:16px}
+.cb-log{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+.cb-msg{max-width:85%;padding:9px 12px;border-radius:12px;font-size:14px;line-height:1.45;white-space:pre-line}
+.cb-bot{background:var(--card);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}
+.cb-user{background:var(--ink);color:var(--bg);align-self:flex-end;border-bottom-right-radius:4px}
+.cb-msg a{color:var(--accent);font-weight:700}
+.cb-chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 10px}
+.cb-chip{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:6px 11px;font-size:13px;font-weight:600}
+.cb-chip:hover{border-color:var(--accent)}
+.cb-form{display:flex;gap:8px;padding:10px;border-top:1px solid var(--line)}
+.cb-form input{flex:1;min-width:0;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:999px;padding:10px 14px;font:inherit;font-size:14px}
+.cb-form button{background:var(--accent);color:var(--accent-ink);border:0;border-radius:999px;padding:0 16px;font-weight:700}
+.cb-typing{opacity:.6;font-style:italic}
+</style>
+
+<button class="cb-fab" id="cbFab" type="button" aria-label="Open de OUTRUN-chat">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>
+  Vraag het ons
+</button>
+
+<div class="cb-panel" id="cbPanel" role="dialog" aria-label="OUTRUN chat" hidden>
+  <div class="cb-head">
+    <div><b>Outrun</b><small>Stel je vraag, we helpen je direct</small></div>
+    <button class="cb-x" id="cbClose" type="button" aria-label="Chat sluiten">×</button>
+  </div>
+  <div class="cb-log" id="cbLog" aria-live="polite"></div>
+  <div class="cb-chips" id="cbChips"></div>
+  <form class="cb-form" id="cbForm">
+    <input id="cbInput" type="text" autocomplete="off" placeholder="Typ je vraag…" aria-label="Je vraag">
+    <button type="submit">Stuur</button>
+  </form>
+</div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const fab = $("cbFab"), panel = $("cbPanel"), log = $("cbLog"), chipsEl = $("cbChips"), form = $("cbForm"), input = $("cbInput");
+  const snap = CONFIG.snapUsername;
+  const snapLink = `<a href="${snapUrl}" target="_blank" rel="noopener">${snap}</a>`;
+  const DEFAULT_CHIPS = ["Welke maat past mij?", "Prijzen", "Verzending", "Ophalen", "Iets aanvragen"];
+
+  const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+  const has = (t, words) => words.filter(w => t.includes(w)).length;
+
+  const PRODUCT_WORDS = {
+    puffer: ["puffer", "jas", "jassen", "jacket", "winterjas", "nightrun"],
+    track1: ["track set 01", "set 01"],
+    track2: ["track set 02", "set 02", "kobalt", "blauw"],
+    stride: ["schoen", "sneaker", "stride", "schoenen", "sneakers"],
+    cap: ["pet", "petten", "cap", "pace"],
+    beanie: ["muts", "mutsen", "beanie", "cold lap"]
+  };
+  const TRACK_WORDS = ["trainingspak", "trainingspakken", "tracksuit", "pak", "joggingpak", "hoodie", "jogging"];
+  const BRANDS = ["nike", "moncler", "jordan", "stone island", "north face", "trapstar", "corteiz", "canada goose", "adidas", "gucci", "louis vuitton", "lv ", "prada", "balenciaga", "arcteryx", "arc'teryx", "ralph lauren", "lacoste", "palm angels", "off-white", "off white", "yeezy", "new balance", "puma", "burberry", "dior", "supreme"];
+
+  function findProducts(t){
+    const hits = PRODUCTS.filter(p => has(t, PRODUCT_WORDS[p.id] || []) > 0);
+    if (!hits.length && has(t, TRACK_WORDS)) return PRODUCTS.filter(p => p.cat === "Trainingspakken");
+    return hits;
+  }
+  const productLine = p => `• ${p.name}: ${euro(p.price)} · ${p.colors.map(c => c[0].toLowerCase()).join(", ")} · maten ${p.sizes.join(", ")}`;
+
+  function sizeFor(cm){
+    if (cm < 165) return "S (valt ruim, dus S is voor jou de beste keuze)";
+    if (cm < 172) return "S";
+    if (cm < 178) return "M";
+    if (cm < 184) return "L";
+    if (cm <= 190) return "XL";
+    return "XL (bij ruim 1,90 m raden we je aan even te snappen, dan checken we de lengte)";
+  }
+
+  function answer(raw){
+    const t = " " + norm(raw) + " ";
+    const prods = findProducts(t);
+    const cm = (t.match(/\b(1[4-9]\d|20\d)\b/) || [])[1];
+    const brand = BRANDS.find(b => t.includes(b));
+
+    if (brand) return { text: `We verkopen geen kleding van andere merken, alleen ons eigen label OUTRUN. Zoek je iets in die stijl? Stuur een foto via Snap naar ${snapLink}, dan zoeken we een OUTRUN-versie voor je.`, chips: ["Iets aanvragen", "Bekijk de collectie"] };
+
+    const intents = {
+      greet:   has(t, [" hoi ", " hallo ", " hey ", " hi ", " yo ", " salam", " goedemiddag", " goedemorgen", " goedenavond", " hee "]),
+      thanks:  has(t, ["bedankt", "dank je", "dankje", "thanks", "thnx", "top", "chill"]),
+      size:    has(t, ["maat", "maten", "size", "past", "valt", "groot", "klein", "lengte", "cm", "oversized"]) + (cm ? 2 : 0),
+      price:   has(t, ["prijs", "prijzen", "kost", "kosten", "hoeveel", "duur", "goedkoop", "euro"]),
+      ship:    has(t, ["verzend", "verzending", "bezorg", "lever", "postnl", "opsturen", "hoe lang", "wanneer binnen", "track"]),
+      pickup:  has(t, ["ophalen", "afhalen", "leiden", "langskomen", "oppikken", "halen"]),
+      pay:     has(t, ["betaal", "betalen", "tikkie", "ideal", "betaling", "pin", "contant", "cash"]),
+      order:   has(t, ["bestel", "bestellen", "kopen", "koop", "reserveer", "reserveren", "hoe werkt"]),
+      request: has(t, ["aanvraag", "aanvragen", "zoek", "andere kleur", "heb je ook", "hebben jullie ook", "kunnen jullie", "regelen", "speciaal"]),
+      drop:    has(t, ["drop", "nieuw", "voorraad", "uitverkocht", "live", "binnenkort", "wanneer"]),
+      returns: has(t, ["retour", "ruilen", "terugsturen", "omruilen", "geld terug"]),
+      human:   has(t, ["snap", "snapchat", "contact", "mens", "medewerker", "bellen", "whatsapp", "insta"]),
+      catalog: has(t, ["collectie", "producten", "wat verkopen", "wat hebben", "aanbod", "shop"])
+    };
+    let best = Object.entries(intents).sort((a,b) => b[1]-a[1])[0];
+    let intent = best[1] > 0 ? best[0] : (prods.length ? "product" : "fallback");
+    if (prods.length && ["greet","thanks","catalog","drop"].includes(intent)) intent = "product";
+
+    switch(intent){
+      case "size": {
+        if (prods.some(p => p.id === "stride")) return { text: `De Stride Low hebben we in maat ${PRODUCTS.find(p=>p.id==="stride").sizes.join(", ")}. Ze vallen normaal, dus neem je gewone schoenmaat.`, chips: ["Prijzen", "Hoe bestel ik?"] };
+        if (prods.length && prods.every(p => p.sizes.length === 1)) return { text: `${prods.map(p=>p.name).join(" en ")} is one size en past vrijwel iedereen.`, chips: ["Prijzen", "Hoe bestel ik?"] };
+        if (cm) return { text: `Met ${cm} cm raden we maat ${sizeFor(+cm)} aan voor trainingspakken en jassen. Alles valt oversized. Wil je het strakker, neem dan een maat kleiner.`, chips: ["Maattabel", "Hoe bestel ik?"] };
+        return { text: "Hoe lang ben je? Typ bijvoorbeeld \"ik ben 180\", dan geef ik je maatadvies.\n\nKort gezegd: S = 165-172 cm, M = 172-178 cm, L = 178-184 cm, XL = 184-190 cm. Alles valt oversized.", chips: ["Ik ben 175", "Ik ben 182", "Maattabel"] };
+      }
+      case "price":
+      case "product":
+      case "catalog": {
+        const list = prods.length ? prods : PRODUCTS;
+        return { text: (prods.length ? "" : `Dit zit in ${CONFIG.dropName}:\n`) + list.map(productLine).join("\n") + "\n\nTik op een product in de shop om je kleur en maat te kiezen.", chips: ["Welke maat past mij?", "Hoe bestel ik?", "Bekijk de collectie"] };
+      }
+      case "ship":   return { text: "We versturen door heel Nederland met PostNL en track & trace, binnen 1-2 werkdagen na betaling.", chips: ["Ophalen", "Betalen", "Hoe bestel ik?"] };
+      case "pickup": return { text: `Woon je in de omgeving Leiden? Dan kun je je bestelling ook ophalen. Spreek een tijd en plek af via Snap: ${snapLink}.`, chips: ["Hoe bestel ik?", "Verzending"] };
+      case "pay":    return { text: "Je betaalt met een Tikkie (iDEAL) nadat we je bestelling hebben bevestigd. We versturen pas als er betaald is. Betaal je niet binnen 24 uur, dan vervalt je reservering.", chips: ["Hoe bestel ik?", "Verzending"] };
+      case "order":  return { text: `Zo werkt het:\n1. Tik op een product en kies kleur en maat.\n2. Tik op de Snapchat-knop. Je bestelcode wordt gekopieerd.\n3. Plak de code in de chat met ${snapLink}.\n4. Je krijgt een Tikkie. Na betaling versturen we binnen 1-2 werkdagen.`, chips: ["Bekijk de collectie", "Betalen", "Welke maat past mij?"] };
+      case "request":return { text: `Staat het er niet tussen? Stuur een foto of omschrijving naar ${snapLink}. We zoeken het voor je en sturen je de prijs en levertijd.`, chips: ["Bekijk de collectie", "Prijzen"] };
+      case "drop":   return { text: CONFIG.dropLive ? `${CONFIG.dropName} is nu live. Op is op, dus wees er snel bij.` : `${CONFIG.dropName} komt eraan. Je kunt nu al reserveren via de shop. Volg ${snapLink} voor de datum.`, chips: ["Bekijk de collectie", "Hoe bestel ik?"] };
+      case "returns":return { text: `Wil je iets ruilen of terugsturen? Stuur ons een snap via ${snapLink}, dan kijken we het samen na.`, chips: ["Hoe bestel ik?", "Welke maat past mij?"] };
+      case "human":  return { text: `Je kunt ons altijd direct snappen: ${snapLink}.`, chips: ["Hoe bestel ik?", "Iets aanvragen"] };
+      case "thanks": return { text: "Graag gedaan! Nog iets anders?", chips: DEFAULT_CHIPS };
+      case "greet":  return { text: "Hey! Waar kan ik je mee helpen?", chips: DEFAULT_CHIPS };
+      default:       return { text: `Daar heb ik niet meteen een antwoord op. Stuur je vraag via Snap naar ${snapLink}, dan helpen we je persoonlijk.`, chips: DEFAULT_CHIPS };
+    }
+  }
+
+  const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+  function add(html, who){
+    const d = document.createElement("div");
+    d.className = "cb-msg " + (who === "user" ? "cb-user" : "cb-bot");
+    d.innerHTML = html; log.appendChild(d); log.scrollTop = log.scrollHeight; return d;
+  }
+  function setChips(list){ chipsEl.innerHTML = list.map(c => `<button type="button" class="cb-chip">${c}</button>`).join(""); }
+
+  function ask(q){
+    q = q.trim(); if (!q) return;
+    if (q === "Bekijk de collectie"){ add(esc(q), "user"); close(); document.getElementById("shop").scrollIntoView({behavior:"smooth"}); return; }
+    if (q === "Maattabel"){ add(esc(q), "user"); close(); document.getElementById("maten").scrollIntoView({behavior:"smooth"}); return; }
+    add(esc(q), "user"); setChips([]);
+    const typing = add("…", "bot"); typing.classList.add("cb-typing");
+    const map = {"Prijzen":"prijzen","Verzending":"verzending","Ophalen":"ophalen","Iets aanvragen":"aanvragen","Hoe bestel ik?":"hoe bestel ik","Betalen":"betalen"};
+    const r = answer(map[q] || q);
+    setTimeout(() => { typing.classList.remove("cb-typing"); typing.innerHTML = r.text; setChips(r.chips); log.scrollTop = log.scrollHeight; }, 450);
+  }
+
+  let started = false;
+  function open(){
+    panel.hidden = false; fab.hidden = true;
+    if (!started){ started = true; add(`Hey! Ik ben de OUTRUN-assistent. Vraag me alles over maten, prijzen, verzending of bestellen.`, "bot"); setChips(DEFAULT_CHIPS); }
+    input.focus();
+  }
+  function close(){ panel.hidden = true; fab.hidden = false; fab.focus(); }
+
+  fab.addEventListener("click", open);
+  $("cbClose").addEventListener("click", close);
+  chipsEl.addEventListener("click", e => { const b = e.target.closest(".cb-chip"); if (b) ask(b.textContent); });
+  form.addEventListener("submit", e => { e.preventDefault(); ask(input.value); input.value = ""; });
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && !panel.hidden) close(); });
+})();
+</script>
+<!-- ====== EINDE CHATBOT ====== -->
+
 </body>
 </html>
