@@ -250,22 +250,9 @@ footer .logo{font-size:22px;color:var(--ink)}
           <input type="hidden" name="_template" value="table">
           <input type="hidden" name="_next" id="reqNext" value="">
           <input type="text" name="_honey" class="req-honey" tabindex="-1" autocomplete="off" aria-hidden="true">
-          <div class="req-row">
-            <label class="req-field"><span>Naam</span><input id="reqName" name="Naam" type="text" required autocomplete="given-name" placeholder="Je voornaam"></label>
-            <label class="req-field"><span>Snapchat-naam</span><input id="reqSnap" name="Snapchat" type="text" required placeholder="Zodat we je kunnen terugsnappen"></label>
-          </div>
+          <label class="req-field"><span>Je Snapchat-naam</span><input id="reqSnap" name="Snapchat" type="text" required autocomplete="off" placeholder="Zodat we je kunnen terugsnappen"></label>
           <label class="req-field"><span>Wat zoek je?</span><textarea id="reqText" name="Aanvraag" rows="3" required placeholder="Bijv. een zwarte puffer met capuchon, oversized"></textarea></label>
-          <div class="req-row">
-            <label class="req-field"><span>Maat</span>
-              <select id="reqSize" name="Maat">
-                <option value="">Weet ik nog niet</option>
-                <option>S</option><option>M</option><option>L</option><option>XL</option>
-                <option>Schoenmaat 40</option><option>Schoenmaat 41</option><option>Schoenmaat 42</option><option>Schoenmaat 43</option><option>Schoenmaat 44</option><option>Schoenmaat 45</option>
-                <option>One size</option>
-              </select>
-            </label>
-            <label class="req-field"><span>Budget (optioneel)</span><input id="reqBudget" name="Budget" type="text" placeholder="Bijv. €60"></label>
-          </div>
+          <label class="req-field"><span>Maat (optioneel)</span><input id="reqSize" name="Maat" type="text" autocomplete="off" placeholder="Bijv. L, 43 of one size"></label>
           <div class="req-field">
             <span>Foto's (optioneel, max 3)</span>
             <label class="req-pick" for="reqPick">+ Foto's toevoegen</label>
@@ -471,7 +458,7 @@ function toast(msg, ms){ toastEl.textContent = msg; toastEl.hidden = false; clea
 (() => {
   const form = document.getElementById("reqForm");
   form.action = "https://formsubmit.co/" + CONFIG.email;
-  document.getElementById("reqNext").value = CONFIG.siteUrl + "#bedankt";
+  document.getElementById("reqNext").value = (location.protocol.startsWith("http") ? location.origin + location.pathname : CONFIG.siteUrl) + "#bedankt";
   const mail = document.getElementById("mailLink");
   mail.href = "mailto:" + CONFIG.email + "?subject=" + encodeURIComponent("Vraag via OUTRUN-site");
   const pick = document.getElementById("reqPick"), thumbs = document.getElementById("reqThumbs"), filesEl = document.getElementById("reqFiles");
