@@ -90,6 +90,7 @@
 $("mailLink").href = "mailto:" + CONFIG.email + "?subject=" + encodeURIComponent("Vraag via OUTRUN-site");
 $("shipCost").textContent = `Verzenden met PostNL kost ${euro(CONFIG.shippingCost)}` + (CONFIG.freeShippingFrom ? `, en is gratis vanaf ${euro(CONFIG.freeShippingFrom)}.` : ".") + (CONFIG.pickupPlace ? ` Ophalen in ${CONFIG.pickupPlace} is altijd gratis.` : "");
 </script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js"></script>
 <script src="assets/motion.js"></script>
 <script src="assets/chatbot.js"></script>
 </body>

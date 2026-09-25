@@ -20,25 +20,26 @@
 
 <main>
   <section class="hero">
-    <div class="wrap hero-grid">
-      <div class="hero-copy">
-        <div>
-          <div class="eyebrow" data-enter style="--i:0">Streetwear · verzending door heel Nederland</div>
-          <h1 class="wordmark" data-enter style="--i:0">Outrun</h1>
-        </div>
-        <div class="drop-status" data-enter style="--i:1"><span class="dot"></span><span id="dropStatus"></span></div>
-        <p data-enter style="--i:2"><strong>Look duur, betaal eerlijk.</strong> Puffers, hoodies, trainingspakken, sneakers en meer in kleine drops. Op is op, dus wees er snel bij.</p>
-        <div class="hero-actions" data-enter style="--i:3">
-          <a href="shop.html" class="snap-btn">Shop de collectie</a>
-          <a href="shop.html?filter=nieuw" class="ghost-btn">Nieuw binnen</a>
-          <button type="button" class="ghost-btn" data-open-chat>Vraag de chatbot</button>
-        </div>
-        <div class="stats" id="stats" data-enter style="--i:4"></div>
+    <div class="wrap">
+      <div class="hero-top" data-enter style="--i:0">
+        <span class="eyebrow">Streetwear · verzending door heel Nederland</span>
+        <div class="drop-status"><span class="dot"></span><span id="dropStatus"></span></div>
       </div>
-      <a class="hero-img" href="lookbook.html" data-cursor="Lookbook">
-        <img src="img/look-hero.jpg" alt="Twee jongens in zwarte OUTRUN-streetwear tegen een blauwe lucht" fetchpriority="high">
-        <div class="caption"><div><div class="eyebrow" style="color:#fff;opacity:.85">Lookbook</div><b style="font-family:var(--display);font-size:30px;text-transform:uppercase;font-style:italic">Night shift</b></div><span class="snap-btn">Bekijk de looks</span></div>
-      </a>
+      <div class="hero-mark"><h1 class="wordmark" data-fit data-split-chars>Outrun</h1></div>
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <p><strong>Look duur, betaal eerlijk.</strong> Puffers, hoodies, trainingspakken, sneakers en meer in kleine drops. Op is op, dus wees er snel bij.</p>
+          <div class="hero-actions">
+            <a href="shop.html" class="snap-btn">Shop de collectie <span aria-hidden="true">→</span></a>
+            <a href="shop.html?filter=nieuw" class="ghost-btn">Nieuw binnen</a>
+          </div>
+          <div class="stats" id="stats"></div>
+        </div>
+        <a class="hero-img" href="lookbook.html" data-cursor="Lookbook →">
+          <img src="img/look-hero.jpg" alt="Twee jongens in zwarte OUTRUN-streetwear tegen een blauwe lucht" fetchpriority="high">
+          <div class="caption"><div><div class="eyebrow">Lookbook · Look 01</div><b>Night shift</b></div><span class="round-arrow" aria-hidden="true">↗</span></div>
+        </a>
+      </div>
     </div>
   </section>
 
@@ -74,7 +75,7 @@
 
   <section class="section">
     <div class="wrap">
-      <a class="banner" href="product.html?id=fleece" style="text-decoration:none" data-cursor="Bekijk">
+      <a class="banner" href="product.html?id=fleece" style="text-decoration:none" data-cursor="Bekijk →">
         <img src="img/fleece-creme.jpg" alt="" loading="lazy" style="object-position:center 30%">
         <div class="banner-body">
           <div class="eyebrow">Binnenkort</div>
@@ -126,6 +127,7 @@ $("cats").innerHTML = CATS.map(c => {
 $("newGrid").innerHTML = PRODUCTS.filter(p => p.isNew).slice(0, 4).map(card).join("");
 $("lastGrid").innerHTML = PRODUCTS.filter(p => !p.soon && !isSoldOut(p)).sort((a, b) => productTotal(a) - productTotal(b)).slice(0, 4).map(card).join("");
 </script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js"></script>
 <script src="assets/motion.js"></script>
 <script src="assets/chatbot.js"></script>
 </body>

@@ -23,13 +23,14 @@ Conceptwebsite voor **OUTRUN**, een eigen streetwear-label dat kleding verkoopt.
 ## Features
 
 - **Bestellen via de site**: winkelmand in een uitschuiflade (bewaard in de browser, aantallen begrensd door de voorraad), balk tot gratis verzending en een afrekenpagina. De bestelling gaat via [FormSubmit](https://formsubmit.co) naar de mail van de winkel, en de klant krijgt automatisch een bevestiging. Betalen gaat met een iDEAL-betaalverzoek.
-- **Animaties**: startanimatie bij het eerste bezoek, woorden die in beeld schuiven, fade-ins en foto-reveals bij het scrollen, subtiele parallax, een header die wegschuift bij omlaag scrollen, een scrollbalk en zachte overgangen tussen pagina's
-- **Eigen cursor** (alleen met muis): volgt de muis vloeiend, wordt groter boven knoppen en toont "Bekijk" boven producten. Knoppen trekken licht naar de cursor toe.
+- **Startanimatie** bij het eerste bezoek: het logo husselt zich uit willekeurige tekens, productfoto's stapelen zich erachter op en daarna zoom je door het woord de site in (over te slaan met een klik of toets)
+- **Animaties**: panelen die over het scherm vegen tussen pagina's, vloeiend scrollen met [Lenis](https://github.com/darkroomengineering/lenis), koppen die woord voor woord in beeld schuiven, foto-reveals en parallax, een marquee die meebeweegt met je scrollsnelheid en een header die wegschuift bij omlaag scrollen
+- **Eigen cursor** (alleen met muis): een blob die uitrekt in de richting waarin je beweegt, om knoppen heen plakt en ze in kleur omkeert, en boven producten een "Bekijk →"-cirkel toont. Knoppen trekken licht naar de cursor toe.
 - **Voorraad per kleur en maat**: labels voor "Uitverkocht", "Bijna op", "Nieuw", "Binnenkort" en sale-percentages worden automatisch berekend uit de productdata
 - **Chatbot** (regelgebaseerd, geen externe API) die intenties herkent (maat, voorraad, prijs, verzending, ophalen, betalen, bestellen, aanvragen). Hij geeft maatadvies op basis van lengte, weet wat er per maat en kleur nog op voorraad is en kent op een productpagina het product dat je bekijkt.
 - **Aanvraagformulier** met foto-upload (max. 3, voorbeelden en validatie van de bestandsgrootte), verstuurd via FormSubmit naar e-mail
 - **Responsive** van telefoon tot desktop, met **light en dark mode** (volgt het systeem, met een knop om te wisselen)
-- **Toegankelijk**: toetsenbordfocus, `aria`-labels, Escape sluit de chat en de winkelmand. Met `prefers-reduced-motion` staan alle animaties en de eigen cursor uit.
+- **Toegankelijk**: toetsenbordfocus, `aria`-labels, Escape sluit de chat en de winkelmand. Met `prefers-reduced-motion` staan alle animaties, het vloeiend scrollen en de eigen cursor uit.
 
 | Collectie | Productpagina met chatbot | Mobiel |
 | --- | --- | --- |
@@ -37,10 +38,10 @@ Conceptwebsite voor **OUTRUN**, een eigen streetwear-label dat kleding verkoopt.
 
 ## Techniek
 
-- HTML, CSS en vanilla JavaScript, zonder dependencies
+- HTML, CSS en vanilla JavaScript, zonder build-stap. Enige externe script: Lenis via jsDelivr (zonder Lenis scrolt de site gewoon normaal).
 - `assets/data.js`: instellingen, producten en lookbook
 - `assets/site.js`: header, footer, winkelmand, productkaarten en voorraadlogica, gedeeld door alle pagina's
-- `assets/motion.js`: startanimatie, scroll-animaties, cursor en pagina-overgangen
+- `assets/motion.js`: startanimatie, pagina-overgangen, vloeiend scrollen, scroll-animaties en cursor
 - `assets/chatbot.js`: de chatbot
 - `assets/style.css`: alle styling
 - Hosting getest op GitHub Pages

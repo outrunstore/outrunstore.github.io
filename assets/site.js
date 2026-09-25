@@ -37,15 +37,18 @@ function priceHtml(p){
 function card(p){
   const img2 = (p.colors[1] && p.colors[1].img) || (p.extra && p.extra[0]);
   const sizes = sizesOf(p);
+  const free = sizesInStock(p);
+  const quick = p.soon ? "Binnenkort binnen" : !free.length ? "Uitverkocht" : free.length === 1 && free[0] === "One size" ? "Op voorraad" : "Op voorraad: " + free.join(" · ");
   const sizeLine = p.soon ? '<span class="meta">Binnenkort</span>'
     : sizes.length === 1 ? `<span class="meta">${isSoldOut(p) ? "Uitverkocht" : sizes[0]}</span>`
     : `<span class="size-line">${sizes.map(s => sizesInStock(p).includes(s) ? `<span>${s}</span>` : `<s title="Uitverkocht">${s}</s>`).join("")}</span>`;
   return `
-  <a class="card${isSoldOut(p) ? " is-out" : ""}" href="${productUrl(p)}" data-cursor="Bekijk">
+  <a class="card${isSoldOut(p) ? " is-out" : ""}" href="${productUrl(p)}" data-cursor="Bekijk →">
     <div class="card-img">
       ${badges(p)}
       <img src="${p.colors[0].img}" alt="${esc(p.name)} in ${esc(p.colors[0].n.toLowerCase())}" loading="lazy">
       ${img2 ? `<img class="alt" src="${img2}" alt="" loading="lazy">` : ""}
+      <div class="card-quick" aria-hidden="true"><span>${quick}</span><span>${euro(p.price)}</span></div>
     </div>
     <div class="card-info">
       <div class="row"><h3>${esc(p.name)}</h3><span>${priceHtml(p)}</span></div>
@@ -166,7 +169,7 @@ function renderChrome(){
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
     </div>
-    <div class="drawer-body" id="cartBody"></div>
+    <div class="drawer-body" id="cartBody" data-lenis-prevent></div>
     <div class="drawer-foot" id="cartFoot"></div>
   </aside>`);
 
@@ -206,11 +209,13 @@ function openCart(){
   cartLastFocus = document.activeElement;
   document.documentElement.classList.add("cart-open");
   $("cartDrawer").setAttribute("aria-hidden", "false");
+  window.lenis && window.lenis.stop();
   setTimeout(() => $("cartClose").focus(), 50);
 }
 function closeCart(){
   document.documentElement.classList.remove("cart-open");
   $("cartDrawer").setAttribute("aria-hidden", "true");
+  window.lenis && window.lenis.start();
   if (cartLastFocus) cartLastFocus.focus();
 }
 
@@ -267,4 +272,16 @@ function toast(msg, ms){
   clearTimeout(toastTimer); toastTimer = setTimeout(() => el.hidden = true, ms || 2600);
 }
 
+/* ---------- groot logo precies de volle breedte laten vullen ---------- */
+function fitText(){
+  document.querySelectorAll("[data-fit]").forEach(el => {
+    el.style.fontSize = "100px";
+    const w = el.scrollWidth, room = el.parentElement.clientWidth;
+    if (w) el.style.fontSize = Math.min(100 * room / w * 0.93, 400).toFixed(1) + "px"; /* marge voor de schuine stand */
+  });
+}
+
 renderChrome();
+fitText();
+addEventListener("resize", fitText);
+if (document.fonts) document.fonts.ready.then(fitText);

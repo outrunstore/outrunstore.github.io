@@ -3,15 +3,14 @@
   document.body.insertAdjacentHTML("beforeend", `
   <button class="cb-fab" id="cbFab" type="button" aria-label="Open de OUTRUN-chatbot">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="7" width="16" height="12" rx="3"/><path d="M12 7V4M9 12h.01M15 12h.01M9 16h6"/></svg>
-    <span class="cb-label">Chat met onze bot</span> <span class="cb-live" aria-hidden="true"></span>
+    <span class="cb-label">Vragen? Chat met ons</span><span class="cb-live" aria-hidden="true"></span>
   </button>
-  <div class="cb-teaser" id="cbTeaser" hidden><b>Yo, vragen?</b>Onze chatbot helpt je 24/7 met maten, voorraad en bestellen.<button type="button" id="cbTeaserX" aria-label="Sluiten">×</button></div>
   <div class="cb-panel" id="cbPanel" role="dialog" aria-label="OUTRUN chatbot" hidden>
     <div class="cb-head">
       <div><b>Outrun Bot</b><small class="cb-status"><i></i>Chatbot · 24/7 online</small></div>
       <button class="cb-x" id="cbClose" type="button" aria-label="Chat sluiten">×</button>
     </div>
-    <div class="cb-log" id="cbLog" aria-live="polite"></div>
+    <div class="cb-log" id="cbLog" aria-live="polite" data-lenis-prevent></div>
     <div class="cb-chips" id="cbChips"></div>
     <form class="cb-form" id="cbForm">
       <input id="cbInput" type="text" autocomplete="off" placeholder="Typ je vraag…" aria-label="Je vraag">
@@ -177,9 +176,8 @@
   }
 
   let started = false;
-  const teaser = $("cbTeaser");
   function open(){
-    panel.hidden = false; fab.hidden = true; teaser.hidden = true;
+    panel.hidden = false; fab.hidden = true;
     if (!started){
       started = true;
       const ctx = window.currentProduct;
@@ -193,13 +191,6 @@
   fab.addEventListener("click", open);
   window.openChat = open;
   document.querySelectorAll("[data-open-chat]").forEach(b => b.addEventListener("click", open));
-  teaser.addEventListener("click", e => { if (e.target.id === "cbTeaserX"){ teaser.hidden = true; return; } open(); });
-  let seen = false;
-  try { seen = sessionStorage.getItem("outrun-teaser") === "1"; } catch(e){}
-  if (!seen) setTimeout(() => {
-    if (!started && panel.hidden) teaser.hidden = false;
-    try { sessionStorage.setItem("outrun-teaser", "1"); } catch(e){}
-  }, 3500);
   $("cbClose").addEventListener("click", close);
   chipsEl.addEventListener("click", e => { const b = e.target.closest(".cb-chip"); if (b) ask(b.textContent); });
   form.addEventListener("submit", e => { e.preventDefault(); ask(input.value); input.value = ""; });

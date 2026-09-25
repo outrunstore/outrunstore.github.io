@@ -184,10 +184,18 @@ const LOOKS = [
   const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (!calm) {
     root.classList.add("motion");
-    setTimeout(() => root.classList.add("is-ready"), 4000); /* vangnet als motion.js niet laadt */
+    setTimeout(() => root.classList.add("is-ready"), 6000); /* vangnet als motion.js niet laadt */
   }
   if (!seen && !calm) {
     root.classList.add("intro-pending");
-    setTimeout(() => root.classList.remove("intro-pending"), 4000); /* vangnet */
+    setTimeout(() => root.classList.remove("intro-pending"), 6000); /* vangnet */
+  } else if (!calm) {
+    /* kwamen we binnen via een pagina-overgang? dan start de pagina bedekt door het paneel */
+    let wipe = false;
+    try { wipe = sessionStorage.getItem("outrun-wipe") === "1"; sessionStorage.removeItem("outrun-wipe"); } catch(e){}
+    if (wipe) {
+      root.classList.add("wipe-in");
+      setTimeout(() => root.classList.remove("wipe-in"), 3000); /* vangnet */
+    }
   }
 })();
