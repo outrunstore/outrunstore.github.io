@@ -40,20 +40,20 @@ OUTRUN is een complete webshop zonder backend en zonder framework, met 46 items 
 | --- | --- |
 | ![Winkelmand](docs/cart.png) | ![Afrekenen](docs/checkout.png) |
 
-| Mobiel | Mobiel, donker |
+| Mobiel | Sieraden op mobiel, donker |
 | --- | --- |
-| <img src="docs/mobile.png" width="320" alt="Homepage op mobiel"> | <img src="docs/mobile-dark.png" width="320" alt="Productpagina op mobiel in dark mode"> |
+| <img src="docs/mobile.png" width="320" alt="Homepage op mobiel"> | <img src="docs/mobile-dark.png" width="320" alt="Cuban Chain op mobiel in dark mode"> |
 
 ## Pagina's
 
 | Pagina | Inhoud |
 | --- | --- |
-| `index.html` | Hero, categorieën, nieuwe items, "Binnenkort"-banner, laatste stuks |
+| `index.html` | Hero met live HUD, scroll-statement, 3D-drop-ring, categorieën, nieuwe items, accessoires-bento, lookbook-strook, laatste stuks en de drop-countdown |
 | `shop.html` | Alle producten. Filter op categorie, maat, "Nieuw", "Sale" en "alleen op voorraad", met zoeken, sorteren en 2 tot 5 kolommen. De filters staan in de URL. |
-| `product.html?id=…` | Foto's per kleur, kleur- en maatkeuze, voorraadmelding, "In winkelmand", gerelateerde items |
+| `product.html?id=…` | Foto's per kleur, artikelnummer, kleur- en maatkeuze, voorraadmelding, "In winkelmand", gerelateerde items met een passend accessoire of sieraad |
 | `afrekenen.html` | Gegevens, verzenden of ophalen, overzicht met verzendkosten, bedankpagina met bestelnummer |
 | `lookbook.html` | Looks met links naar de producten die erin zitten |
-| `maten.html` | Maattabellen en een maatcalculator |
+| `maten.html` | Maattabellen voor kleding, schoenen, accessoires en sieraden, en een maatcalculator |
 | `aanvragen.html` | Iets aanvragen dat niet in de shop staat, met foto-upload |
 | `info.html` | Veelgestelde vragen over bestellen, betalen, verzenden en ruilen |
 | `over.html` | Het verhaal achter het merk |
