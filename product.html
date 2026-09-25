@@ -29,6 +29,7 @@
           <div class="eyebrow" id="pCat"></div>
           <h1 id="pName"></h1>
           <div class="pdp-price" id="pPrice"></div>
+          <div class="spec" id="pSpec"></div>
         </div>
         <p class="pdp-desc" id="pDesc"></p>
 
@@ -107,6 +108,7 @@ if (!p){
   $("pName").textContent = p.name;
   $("pPrice").innerHTML = priceHtml(p) + (p.was ? ` <span class="tag tag-accent" style="font-size:12px">Bespaar ${euro(p.was - p.price)}</span>` : "");
   $("pDesc").textContent = p.desc;
+  $("pSpec").innerHTML = `<span>Art.nr <b>OR-${skuOf(p)}</b></span><span>Cat <b>${esc(p.cat)}</b></span><span>${esc(CONFIG.dropName.split(" · ")[0])}</span><span>${p.colors.length} ${p.colors.length === 1 ? "kleur" : "kleuren"}</span>`;
   $("pDetails").innerHTML = p.details.map(d => `<li>${esc(d)}</li>`).join("");
   const fitNote = p.details.find(d => /fit|valt|size/i.test(d)) || "";
   $("pFit").innerHTML = p.cat === "Schoenen" ? "Onze sneakers vallen normaal. Pak je eigen maat. Zit je tussen twee maten? Kies de grotere."
@@ -192,10 +194,15 @@ if (!p){
 
   renderGallery(); render();
 
-  /* gerelateerd: eerst dezelfde categorie, dan de rest, uitverkocht achteraan */
-  const others = PRODUCTS.filter(x => x.id !== p.id).sort((a, b) =>
-    (b.cat === p.cat) - (a.cat === p.cat) || isSoldOut(a) - isSoldOut(b));
-  $("related").innerHTML = others.slice(0, 4).map(card).join("");
+  /* gerelateerd: drie uit dezelfde categorie (uitverkocht achteraan) en één accessoire om de fit af te maken */
+  const ACC = ["Accessoires", "Sieraden"];
+  const same = PRODUCTS.filter(x => x.id !== p.id && x.cat === p.cat).sort((a, b) => isSoldOut(a) - isSoldOut(b));
+  const extra = PRODUCTS.filter(x => x.id !== p.id && x.cat !== p.cat && (ACC.includes(p.cat) ? !ACC.includes(x.cat) : ACC.includes(x.cat)) && !isSoldOut(x) && !x.soon)
+    .sort(() => Math.random() - 0.5);
+  const rest = PRODUCTS.filter(x => x.id !== p.id && x.cat !== p.cat && !isSoldOut(x));
+  const picks = [...same.slice(0, 3), ...extra.slice(0, 1)];
+  for (const x of [...extra.slice(1), ...rest]) { if (picks.length >= 4) break; if (!picks.includes(x)) picks.push(x); }
+  $("related").innerHTML = picks.slice(0, 4).map(card).join("");
 }
 </script>
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js"></script>

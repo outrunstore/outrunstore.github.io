@@ -342,7 +342,7 @@
   let tiltEl = null;
   function untilt(el){ el.classList.remove("tilt"); el.style.transform = ""; }
   document.addEventListener("mousemove", e => {
-    const ci = e.target.closest(".card-img, .hpanel-img");
+    const ci = e.target.closest(".card-media, .hpanel-img, .bento-tile");
     if (tiltEl && tiltEl !== ci) untilt(tiltEl);
     tiltEl = ci; if (!ci) return;
     const r = ci.getBoundingClientRect(), px = (e.clientX - r.left) / r.width - 0.5, py = (e.clientY - r.top) / r.height - 0.5;
@@ -351,6 +351,17 @@
     ci.style.setProperty("--gx", ((px + 0.5) * 100).toFixed(1) + "%");
     ci.style.setProperty("--gy", ((py + 0.5) * 100).toFixed(1) + "%");
   }, { passive: true });
+
+  /* links "hacken" bij hover: letters husselen en klikken vast */
+  document.addEventListener("mouseover", e => {
+    const el = e.target.closest("[data-scramble], .link-arrow, .foot-grid a, .crumbs a");
+    if (!el || (e.relatedTarget && el.contains(e.relatedTarget)) || el.children.length) return;
+    if (!el.dataset.txt) el.dataset.txt = el.textContent;
+    const w = el.getBoundingClientRect().width;
+    el.style.display = "inline-block"; el.style.width = w + "px"; el.style.whiteSpace = "nowrap";
+    scramble(el, el.dataset.txt, 380);
+    clearTimeout(el._scrT); el._scrT = setTimeout(() => { el.style.width = ""; }, 420);
+  });
 
   /* knoppen trekken naar de cursor toe */
   const MAG = ".snap-btn, .ghost-btn, .icon-btn, .cart-btn, .cb-fab";

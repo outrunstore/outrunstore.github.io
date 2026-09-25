@@ -38,6 +38,12 @@
         </select>
         <label class="toggle"><input type="checkbox" id="inStock"> Alleen op voorraad</label>
         <span class="result-count" id="count" aria-live="polite"></span>
+        <div class="density" role="group" aria-label="Aantal kolommen">
+          <button type="button" data-cols="2" aria-label="2 kolommen"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><rect x="1" y="1" width="6" height="14" rx="1.5"/><rect x="9" y="1" width="6" height="14" rx="1.5"/></svg></button>
+          <button type="button" data-cols="3" aria-label="3 kolommen"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><rect x="0.5" y="1" width="4" height="14" rx="1.2"/><rect x="6" y="1" width="4" height="14" rx="1.2"/><rect x="11.5" y="1" width="4" height="14" rx="1.2"/></svg></button>
+          <button type="button" data-cols="4" aria-label="4 kolommen"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><rect x="0.5" y="1" width="3" height="14" rx="1"/><rect x="4.5" y="1" width="3" height="14" rx="1"/><rect x="8.5" y="1" width="3" height="14" rx="1"/><rect x="12.5" y="1" width="3" height="14" rx="1"/></svg></button>
+          <button type="button" data-cols="5" aria-label="5 kolommen"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><rect x="0" y="1" width="2.4" height="14" rx=".8"/><rect x="3.4" y="1" width="2.4" height="14" rx=".8"/><rect x="6.8" y="1" width="2.4" height="14" rx=".8"/><rect x="10.2" y="1" width="2.4" height="14" rx=".8"/><rect x="13.6" y="1" width="2.4" height="14" rx=".8"/></svg></button>
+        </div>
       </div>
     </div>
   </div>
@@ -69,8 +75,9 @@ const state = {
 };
 
 /* alle maten, in logische volgorde */
-const ORDER = ["S", "M", "L", "XL", "40", "41", "42", "43", "44", "45", "One size"];
-const allSizes = [...new Set(PRODUCTS.flatMap(sizesOf))].sort((a, b) => ORDER.indexOf(a) - ORDER.indexOf(b));
+const ORDER = ["S", "M", "L", "XL", "S/M", "L/XL", "39-42", "43-46", "40", "41", "42", "43", "44", "45", "17", "19", "21", "50 cm", "60 cm", "85", "95", "105", "One size"];
+const rank = sz => { const i = ORDER.indexOf(sz); return i < 0 ? 999 : i; };
+const allSizes = [...new Set(PRODUCTS.flatMap(sizesOf))].sort((a, b) => rank(a) - rank(b));
 $("size").innerHTML = `<option value="">Alle maten</option>` + allSizes.map(s => `<option value="${s}">Maat ${s}</option>`).join("");
 
 function renderCats(){
@@ -133,6 +140,21 @@ $("reset").addEventListener("click", () => {
   renderCats(); render();
 });
 renderCats(); render();
+
+/* aantal kolommen onthouden (alleen voor deze bezoeker) */
+(() => {
+  let cols = "4";
+  try { cols = localStorage.getItem("outrun-cols") || "4"; } catch(e){}
+  const set = c => {
+    cols = c;
+    $("grid").classList.remove("cols-2", "cols-3", "cols-5");
+    if (c !== "4") $("grid").classList.add("cols-" + c);
+    document.querySelectorAll(".density button").forEach(b => b.setAttribute("aria-pressed", b.dataset.cols === c));
+    try { localStorage.setItem("outrun-cols", c); } catch(e){}
+  };
+  document.querySelector(".density").addEventListener("click", e => { const b = e.target.closest("[data-cols]"); if (b) set(b.dataset.cols); });
+  set(cols);
+})();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js"></script>
 <script src="assets/motion.js"></script>

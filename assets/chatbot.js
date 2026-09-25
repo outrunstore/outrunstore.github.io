@@ -31,15 +31,16 @@
 
   /* woorden per categorie */
   const CAT_WORDS = {
-    "Jassen": ["jas", "jassen", "jacket", "puffer", "winterjas", "bomber", "jack"],
-    "Hoodies": ["hoodie", "hoodies", "trui", "sweater"],
+    "Jassen": ["jas", "jassen", "jacket", "puffer", "winterjas", "bomber", "jack", "windbreaker", "bodywarmer", "vest", "overshirt"],
+    "Hoodies": ["hoodie", "hoodies", "trui", "sweater", "crewneck", "crew"],
     "T-shirts": ["shirt", "tshirt", "t-shirt", "tee", "shirts"],
     "Trainingspakken": ["trainingspak", "trainingspakken", "tracksuit", "joggingpak", "set", "pak"],
-    "Broeken": ["broek", "broeken", "jogger", "joggingbroek", "cargo", "pants"],
+    "Broeken": ["broek", "broeken", "jogger", "joggingbroek", "cargo", "pants", "jeans", "denim", "spijkerbroek", "short", "shorts"],
     "Schoenen": ["schoen", "schoenen", "sneaker", "sneakers", "kicks"],
-    "Petten": ["pet", "petten", "cap", "caps"],
-    "Mutsen": ["muts", "mutsen", "beanie"],
-    "Accessoires": ["tas", "tasje", "bag", "sling", "accessoires"]
+    "Petten": ["pet", "petten", "cap", "caps", "bucket", "hoed", "hoedje"],
+    "Mutsen": ["muts", "mutsen", "beanie", "balaclava", "bivakmuts", "skimask"],
+    "Accessoires": ["tas", "tasje", "bag", "sling", "accessoires", "accessoire", "rugzak", "backpack", "tote", "sokken", "sok", "socks", "zonnebril", "bril", "shades", "handschoen", "handschoenen", "gloves", "riem", "belt", "sjaal", "scarf"],
+    "Sieraden": ["sieraden", "sieraad", "ketting", "chain", "armband", "bracelet", "ring", "ringen", "zilver"]
   };
   /* extra woorden per product naast de productnaam */
   const PRODUCT_WORDS = { gloss: ["glanzend", "glans"], teepack: ["3-pack", "pack"], track01: ["set 01"], track02: ["set 02"], biker: ["leer", "leren"] };

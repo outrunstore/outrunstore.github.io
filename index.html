@@ -22,8 +22,9 @@
   <section class="hero" id="hero">
     <div class="wrap">
       <div class="hero-top" data-enter style="--i:0">
-        <span class="eyebrow">Streetwear · verzending door heel Nederland</span>
-        <div class="drop-status"><span class="dot"></span><span id="dropStatus"></span></div>
+        <span class="eyebrow">Streetwear · Leiden, NL</span>
+        <span class="hud-coords" aria-hidden="true">52.1601° N — 4.4970° E</span>
+        <div class="hud-right"><span class="hud-time" id="hudTime" aria-hidden="true"></span><div class="drop-status"><span class="dot"></span><span id="dropStatus"></span></div></div>
       </div>
       <div class="hero-mark"><h1 class="wordmark" data-fit data-split-chars>Outrun</h1></div>
       <div class="hero-grid">
@@ -60,7 +61,24 @@
     </div>
   </section>
 
-  <section class="section" style="padding-top:0">
+  <section class="orbit" aria-label="De drop in 3D">
+    <div class="wrap orbit-head">
+      <div><div class="eyebrow">Drop 02 · 360°</div><h2>Draai door de drop</h2></div>
+      <p class="orbit-hint">Sleep of scroll om te draaien ↔</p>
+    </div>
+    <div class="orbit-stage" id="orbitStage">
+      <div class="orbit-floor" aria-hidden="true"></div>
+      <div class="orbit-ring" id="orbitRing"></div>
+    </div>
+    <div class="orbit-hud" aria-live="polite">
+      <span class="hud-idx" id="hudIdx"></span>
+      <b id="hudName"></b>
+      <span class="hud-meta" id="hudMeta"></span>
+      <a class="snap-btn" id="hudLink" href="shop.html">Bekijk item <span aria-hidden="true">→</span></a>
+    </div>
+  </section>
+
+  <section class="section">
     <div class="wrap">
       <div class="section-head">
         <div><div class="eyebrow">Categorieën</div><h2>Shop per stijl</h2></div>
@@ -80,6 +98,16 @@
     </div>
   </section>
 
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <div class="section-head">
+        <div><div class="eyebrow">Accessoires &amp; sieraden</div><h2>Maak de fit af</h2></div>
+        <a class="link-arrow" href="shop.html?cat=Accessoires">Alle accessoires →</a>
+      </div>
+      <div class="bento" id="bento"></div>
+    </div>
+  </section>
+
   <section class="hscroll" data-hscroll aria-label="Lookbook">
     <div class="hscroll-sticky">
       <div class="wrap section-head">
@@ -87,20 +115,6 @@
         <a class="link-arrow" href="lookbook.html">Hele lookbook →</a>
       </div>
       <div class="hscroll-track" id="hTrack"></div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="wrap">
-      <a class="banner" href="product.html?id=fleece" style="text-decoration:none" data-cursor="Bekijk →">
-        <img src="img/fleece-creme.jpg" alt="" loading="lazy" style="object-position:center 30%">
-        <div class="banner-body">
-          <div class="eyebrow">Binnenkort</div>
-          <h2>Trail Fleece</h2>
-          <p>Teddy fleece met colour-block panelen. Nog niet binnen. Laat het ons weten en je hoort het als eerste.</p>
-          <span class="snap-btn">Bekijk de Trail Fleece</span>
-        </div>
-      </a>
     </div>
   </section>
 
@@ -153,7 +167,7 @@
 
 <script src="assets/site.js"></script>
 <script>
-const CAT_IMG = {Jassen:"img/nightrun-zwart.jpg", Hoodies:"img/core-taupe.jpg", "T-shirts":"img/blank-zwart.jpg", Trainingspakken:"img/track02-geel.jpg", Broeken:"img/jogger-grijs.jpg", Schoenen:"img/stride-wit.jpg", Petten:"img/pace-grijs.jpg", Mutsen:"img/beanie-oker.jpg", Accessoires:"img/sling-look.jpg"};
+const CAT_IMG = {Jassen:"img/nightrun-zwart.jpg", Hoodies:"img/core-taupe.jpg", "T-shirts":"img/blank-zwart.jpg", Trainingspakken:"img/track02-geel.jpg", Broeken:"img/jogger-grijs.jpg", Schoenen:"img/stride-wit.jpg", Petten:"img/pace-grijs.jpg", Mutsen:"img/balaclava-wit.jpg", Accessoires:"img/shades-shield.jpg", Sieraden:"img/chain-zilver.jpg"};
 
 $("dropStatus").textContent = CONFIG.dropLive ? `${CONFIG.dropName} is live` : `${CONFIG.dropName} · binnenkort`;
 $("stats").innerHTML = `<div><b>${PRODUCTS.length}</b><span>items in de drop</span></div><div><b>${PRODUCTS.filter(isSoldOut).length}</b><span>al uitverkocht</span></div><div><b>1-2</b><span>werkdagen levering</span></div>`;
@@ -168,6 +182,102 @@ $("cats").innerHTML = CATS.map(c => {
 
 $("newGrid").innerHTML = PRODUCTS.filter(p => p.isNew).slice(0, 4).map(card).join("");
 $("lastGrid").innerHTML = PRODUCTS.filter(p => !p.soon && !isSoldOut(p)).sort((a, b) => productTotal(a) - productTotal(b)).slice(0, 4).map(card).join("");
+
+/* live tijd in de hero */
+(() => {
+  const el = $("hudTime");
+  const tick = () => { el.textContent = new Date().toLocaleTimeString("nl-NL", { timeZone: "Europe/Amsterdam", hour12: false }) + " AMS"; };
+  tick(); setInterval(tick, 1000);
+})();
+
+/* bento: accessoires en sieraden */
+(() => {
+  const ids = ["shellpack", "shield", "chain", "transit", "socks", "gridring", "signal"];
+  const items = ids.map(productById).filter(Boolean);
+  $("bento").innerHTML = items.map((p, i) => `
+    <a class="bento-tile${i === 0 ? " is-big" : ""}${isSoldOut(p) ? " is-out" : ""}" href="${productUrl(p)}" data-cursor="Bekijk →">
+      <img src="${p.colors[0].img}" alt="" loading="lazy">
+      ${badges(p)}
+      <span class="bento-code">A/${String(i + 1).padStart(2, "0")}</span>
+      <span class="bento-info"><b>${esc(p.name)}</b><span>${priceHtml(p)}</span></span>
+    </a>`).join("") + `
+    <a class="bento-tile bento-cta is-wide" href="shop.html?cat=Sieraden" data-cursor="Open →">
+      <span class="eyebrow">Nieuw · ${PRODUCTS.filter(p => p.cat === "Sieraden").length} items</span>
+      <b>Sieraden<br>van staal</b>
+      <span class="round-arrow" aria-hidden="true">↗</span>
+    </a>`;
+})();
+
+/* 3D-ring: sleep, scroll of klik om door de drop te draaien */
+(() => {
+  const ring = $("orbitRing"), stage = $("orbitStage");
+  const picks = PRODUCTS.filter(p => !isSoldOut(p) && !p.soon).sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0)).slice(0, 12);
+  const n = picks.length, step = 360 / n;
+  ring.innerHTML = picks.map((p, i) => `<a class="orbit-card" href="${productUrl(p)}" data-i="${i}" draggable="false" style="--a:${(i * step).toFixed(2)}deg"><img src="${p.colors[0].img}" alt="${esc(p.name)}" draggable="false" loading="lazy"></a>`).join("");
+  const cards = [...ring.children];
+  const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const AUTO = calm ? 0 : -0.1;
+  let angle = 0, vel = AUTO, drag = null, moved = 0, snap = null, front = -1;
+
+  function layout(){
+    const small = innerWidth < 700;
+    ring.style.setProperty("--cw", (small ? 160 : 250) + "px");
+    ring.style.setProperty("--r", Math.round(small ? Math.max(340, innerWidth * 0.9) : Math.min(innerWidth, 1400) * 0.4) + "px");
+  }
+  layout(); addEventListener("resize", layout);
+
+  function hud(){
+    const p = picks[front], sizes = sizesInStock(p);
+    $("hudIdx").textContent = `${String(front + 1).padStart(2, "0")} / ${String(n).padStart(2, "0")} · Nº${skuOf(p)}`;
+    scramble($("hudName"), p.name, 380);
+    $("hudMeta").textContent = `${p.cat} · ${euro(p.price)} · ${sizes.length === 1 && sizes[0] === "One size" ? "one size" : sizes.join(" ")}`;
+    $("hudLink").href = productUrl(p);
+  }
+
+  (function frame(){
+    if (snap !== null){ angle += (snap - angle) * 0.12; if (Math.abs(snap - angle) < 0.05){ angle = snap; snap = null; } vel = 0; }
+    else if (!drag){ vel += (AUTO - vel) * 0.03; angle += vel + (window.lenis ? window.lenis.velocity * 0.05 : 0); }
+    ring.style.transform = `translateZ(calc(var(--r) * -1)) rotateX(-7deg) rotateY(${angle.toFixed(2)}deg)`;
+    let best = 0, bestD = 999;
+    cards.forEach((c, i) => {
+      const d = ((i * step + angle) % 360 + 540) % 360 - 180, ad = Math.abs(d);
+      if (ad < bestD){ bestD = ad; best = i; }
+      c.style.opacity = (0.2 + 0.8 * Math.max(0, Math.cos(d * Math.PI / 180))).toFixed(2);
+      c.classList.toggle("is-front", ad < step / 2);
+    });
+    if (best !== front){ front = best; hud(); }
+    requestAnimationFrame(frame);
+  })();
+
+  stage.addEventListener("pointerdown", e => {
+    drag = { x: e.clientX, a: angle, id: e.pointerId, cap: false }; moved = 0; snap = null;
+  });
+  stage.addEventListener("pointermove", e => {
+    if (!drag) return;
+    const dx = e.clientX - drag.x;
+    moved = Math.max(moved, Math.abs(dx));
+    /* pas "vastpakken" als je echt sleept, zodat een gewone klik op een kaart blijft werken */
+    if (!drag.cap && moved > 6){ drag.cap = true; stage.setPointerCapture(drag.id); stage.classList.add("is-drag"); }
+    const na = drag.a + dx * 0.22;
+    vel = na - angle; angle = na;
+  });
+  const end = () => { drag = null; stage.classList.remove("is-drag"); };
+  stage.addEventListener("pointerup", end);
+  stage.addEventListener("pointercancel", end);
+  /* klik: voorste kaart = openen, andere kaart = ernaartoe draaien */
+  ring.addEventListener("click", e => {
+    const c = e.target.closest(".orbit-card"); if (!c) return;
+    if (moved > 6){ e.preventDefault(); return; }
+    const i = +c.dataset.i;
+    if (i !== front){
+      e.preventDefault();
+      let target = -i * step;
+      while (target - angle > 180) target -= 360;
+      while (target - angle < -180) target += 360;
+      snap = target;
+    }
+  });
+})();
 
 /* lookbook: horizontale strook */
 $("lookCount").textContent = LOOKS.length;

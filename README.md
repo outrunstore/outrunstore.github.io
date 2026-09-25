@@ -4,7 +4,7 @@
 
 ![Startanimatie](docs/intro.png)
 
-OUTRUN is een complete webshop zonder backend en zonder framework. Je kiest je maat, legt het in je winkelmand en rekent af. De bestelling komt binnen per mail en je betaalt met een iDEAL-betaalverzoek. Alles draait op statische HTML, CSS en JavaScript en is te hosten op GitHub Pages.
+OUTRUN is een complete webshop zonder backend en zonder framework, met 46 items in 10 categorieën: van puffers en denim tot rugzakken, zonnebrillen en stalen sieraden. Je kiest je maat, legt het in je winkelmand en rekent af. De bestelling komt binnen per mail en je betaalt met een iDEAL-betaalverzoek. Alles draait op statische HTML, CSS en JavaScript en is te hosten op GitHub Pages.
 
 > Conceptproject. De productfoto's zijn stockfoto's van [Unsplash](https://unsplash.com) en tonen niet de echte OUTRUN-producten.
 
@@ -13,6 +13,9 @@ OUTRUN is een complete webshop zonder backend en zonder framework. Je kiest je m
 ## Highlights
 
 - **Startanimatie**: het logo husselt zich uit willekeurige tekens, productfoto's stapelen zich erachter op en daarna zoom je door het woord de site in
+- **3D-drop-ring**: twaalf items draaien in een ring die je met je muis of vinger rondsleept. Een HUD toont naam, artikelnummer, prijs en maten van het voorste item.
+- **Bento-grid** voor accessoires en sieraden, en **snel toevoegen** direct vanaf de productkaart: de foto vliegt naar je winkelmand
+- **Futuristische details**: live tijd en coördinaten in de hero, artikelnummers, links die "hacken" bij hover, een neon-accentkleur en een shopgrid van 2 tot 5 kolommen
 - **Interactieve hero**: beweeg je muis over de homepage en er poppen productfoto's op over het logo, naast een ronde sticker die meedraait met je scrollsnelheid
 - **Scroll-verhaal**: een statement dat woord voor woord oplicht, en een lookbook-strook die opzij schuift terwijl de pagina blijft staan
 - **Drop-countdown**: een live aftelklok naar de volgende drop, met aanmelden voor een mail als hij live gaat
@@ -25,7 +28,11 @@ OUTRUN is een complete webshop zonder backend en zonder framework. Je kiest je m
 
 ## Screenshots
 
-| Shop met hover | Product en chatbot |
+| 3D-drop-ring | Accessoires-bento |
+| --- | --- |
+| ![3D-drop-ring](docs/orbit.png) | ![Accessoires in een bento-grid](docs/bento.png) |
+
+| Shop met snel toevoegen | Product en chatbot |
 | --- | --- |
 | ![Shop](docs/shop.png) | ![Productpagina met chatbot](docs/chat.png) |
 
@@ -42,7 +49,7 @@ OUTRUN is een complete webshop zonder backend en zonder framework. Je kiest je m
 | Pagina | Inhoud |
 | --- | --- |
 | `index.html` | Hero, categorieën, nieuwe items, "Binnenkort"-banner, laatste stuks |
-| `shop.html` | Alle producten. Filter op categorie, maat, "Nieuw", "Sale" en "alleen op voorraad", met zoeken en sorteren. De filters staan in de URL. |
+| `shop.html` | Alle producten. Filter op categorie, maat, "Nieuw", "Sale" en "alleen op voorraad", met zoeken, sorteren en 2 tot 5 kolommen. De filters staan in de URL. |
 | `product.html?id=…` | Foto's per kleur, kleur- en maatkeuze, voorraadmelding, "In winkelmand", gerelateerde items |
 | `afrekenen.html` | Gegevens, verzenden of ophalen, overzicht met verzendkosten, bedankpagina met bestelnummer |
 | `lookbook.html` | Looks met links naar de producten die erin zitten |

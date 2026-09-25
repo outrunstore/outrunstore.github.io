@@ -23,7 +23,7 @@ function badges(p){
   else if (isSoldOut(p)) b.push('<span class="tag tag-ink">Uitverkocht</span>');
   else {
     if (p.was) b.push(`<span class="tag tag-accent">-${Math.round((1 - p.price / p.was) * 100)}%</span>`);
-    if (p.isNew) b.push('<span class="tag">Nieuw</span>');
+    if (p.isNew) b.push('<span class="tag tag-new">Nieuw</span>');
     if (isLow(p)) b.push('<span class="tag tag-warn">Bijna op</span>');
   }
   return b.length ? `<div class="tags">${b.join("")}</div>` : "";
@@ -33,31 +33,87 @@ function priceHtml(p){
   return (p.was ? `<s class="was">${euro(p.was)}</s> ` : "") + `<span class="price${p.was ? " sale" : ""}">${euro(p.price)}</span>`;
 }
 
+/* artikelnummer, bijv. "012" */
+const skuOf = p => String(PRODUCTS.indexOf(p) + 1).padStart(3, "0");
+
 /* productkaart voor grids */
 function card(p){
   const img2 = (p.colors[1] && p.colors[1].img) || (p.extra && p.extra[0]);
   const sizes = sizesOf(p);
   const free = sizesInStock(p);
-  const quick = p.soon ? "Binnenkort binnen" : !free.length ? "Uitverkocht" : free.length === 1 && free[0] === "One size" ? "Op voorraad" : "Op voorraad: " + free.join(" · ");
+  const url = productUrl(p);
+  /* snel toevoegen: een knop per maat die nog op voorraad is */
+  const quick = p.soon ? '<span class="q-note">Binnenkort binnen</span>'
+    : !free.length ? '<span class="q-note">Uitverkocht</span>'
+    : `<span class="q-label">Snel toevoegen</span><span class="q-sizes">${free.map(sz => `<button type="button" data-quick="${p.id}" data-size="${esc(sz)}" aria-label="${esc(p.name)} in maat ${esc(sz)} toevoegen">${sz === "One size" ? "+ In mand" : esc(sz)}</button>`).join("")}</span>`;
   const sizeLine = p.soon ? '<span class="meta">Binnenkort</span>'
     : sizes.length === 1 ? `<span class="meta">${isSoldOut(p) ? "Uitverkocht" : sizes[0]}</span>`
-    : `<span class="size-line">${sizes.map(s => sizesInStock(p).includes(s) ? `<span>${s}</span>` : `<s title="Uitverkocht">${s}</s>`).join("")}</span>`;
+    : `<span class="size-line">${sizes.map(sz => free.includes(sz) ? `<span>${sz}</span>` : `<s title="Uitverkocht">${sz}</s>`).join("")}</span>`;
   return `
-  <a class="card${isSoldOut(p) ? " is-out" : ""}" href="${productUrl(p)}" data-cursor="Bekijk →">
-    <div class="card-img">
-      ${badges(p)}
-      <img src="${p.colors[0].img}" alt="${esc(p.name)} in ${esc(p.colors[0].n.toLowerCase())}" loading="lazy">
-      ${img2 ? `<img class="alt" src="${img2}" alt="" loading="lazy">` : ""}
-      <div class="card-quick" aria-hidden="true"><span>${quick}</span><span>${euro(p.price)}</span></div>
+  <article class="card${isSoldOut(p) ? " is-out" : ""}">
+    <div class="card-media">
+      <a class="card-img" href="${url}" data-cursor="Bekijk →" tabindex="-1" aria-hidden="true">
+        ${badges(p)}
+        <span class="card-sku">Nº${skuOf(p)}</span>
+        <img src="${p.colors[0].img}" alt="" loading="lazy">
+        ${img2 ? `<img class="alt" src="${img2}" alt="" loading="lazy">` : ""}
+      </a>
+      <div class="card-quick">${quick}</div>
     </div>
-    <div class="card-info">
+    <a class="card-info" href="${url}">
       <div class="row"><h3>${esc(p.name)}</h3><span>${priceHtml(p)}</span></div>
       <div class="row">
         ${sizeLine}
         <span class="swatches">${p.colors.map(c => `<span class="sw${colorTotal(c) === 0 && !p.soon ? " sw-out" : ""}" style="background:${c.hex}" title="${esc(c.n)}${colorTotal(c) === 0 && !p.soon ? " (uitverkocht)" : ""}"></span>`).join("")}</span>
       </div>
-    </div>
-  </a>`;
+    </a>
+  </article>`;
+}
+
+/* snel toevoegen vanaf een kaart: eerste kleur die in die maat op voorraad is */
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-quick]"); if (!b) return;
+  e.preventDefault();
+  const p = productById(b.dataset.quick), size = b.dataset.size;
+  const c = p.colors.find(col => col.stock[size] > 0); if (!c) return;
+  if (Cart.add(p.id, c.n, size)){
+    const img = b.closest(".card-media") && b.closest(".card-media").querySelector(".card-img img");
+    flyToCart(img);
+    b.classList.add("is-added");
+    setTimeout(() => b.classList.remove("is-added"), 900);
+    toast(`${p.name} · ${c.n}${size !== "One size" ? " · " + size : ""} in je mand`);
+  }
+});
+
+/* productfoto vliegt naar de winkelmand */
+function flyToCart(img){
+  const target = document.getElementById("cartBtn");
+  if (!img || !target || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const a = img.getBoundingClientRect(), t = target.getBoundingClientRect();
+  const f = img.cloneNode();
+  f.className = "fly"; f.removeAttribute("loading");
+  Object.assign(f.style, { left: a.left + "px", top: a.top + "px", width: a.width + "px", height: a.height + "px" });
+  document.body.append(f);
+  const dx = t.left + t.width / 2 - (a.left + a.width / 2), dy = t.top + t.height / 2 - (a.top + a.height / 2);
+  f.animate([
+    { transform: "translate(0,0) scale(1)", opacity: 1, borderRadius: "10px" },
+    { transform: `translate(${dx * 0.55}px, ${dy * 0.55 - 60}px) scale(.45)`, opacity: 1, offset: 0.6 },
+    { transform: `translate(${dx}px, ${dy}px) scale(.06)`, opacity: 0.2, borderRadius: "50%" }
+  ], { duration: 750, easing: "cubic-bezier(.6,0,.2,1)" }).onfinish = () => f.remove();
+}
+
+/* tekst "hacken": letters husselen en klikken dan vast */
+const SCRAMBLE_GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&*+/<>";
+function scramble(el, text, ms = 420){
+  text = text == null ? el.textContent : text;
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches){ el.textContent = text; return; }
+  cancelAnimationFrame(el._scr);
+  const t0 = performance.now();
+  (function frame(t){
+    const k = Math.min(1, (t - t0) / ms), n = Math.floor(k * text.length);
+    el.textContent = text.slice(0, n) + [...text.slice(n)].map(ch => ch === " " ? " " : SCRAMBLE_GLYPHS[(Math.random() * SCRAMBLE_GLYPHS.length) | 0]).join("");
+    if (k < 1) el._scr = requestAnimationFrame(frame); else el.textContent = text;
+  })(t0);
 }
 
 /* ---------- winkelmand ---------- */
@@ -112,16 +168,19 @@ function shippingFor(subtotal, method){
 /* ---------- header, footer, menu, winkelmand-lade ---------- */
 const BAG_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>';
 const NAV = [
-  ["shop.html", "Shop", "shop"], ["shop.html?filter=nieuw", "Nieuw", "nieuw"], ["lookbook.html", "Lookbook", "lookbook"],
-  ["maten.html", "Maten", "maten"], ["aanvragen.html", "Aanvragen", "aanvragen"], ["info.html", "Info", "info"], ["over.html", "Over ons", "over"]
+  ["shop.html", "Shop", "shop"], ["shop.html?filter=nieuw", "Nieuw", "nieuw"], ["shop.html?cat=Accessoires", "Accessoires", "acc"],
+  ["lookbook.html", "Lookbook", "lookbook"], ["maten.html", "Maten", "maten"], ["info.html", "Info", "info"], ["over.html", "Over ons", "over"]
 ];
 
 function renderChrome(){
   const page = document.body.dataset.page;
-  const onNew = page === "shop" && new URLSearchParams(location.search).get("filter") === "nieuw";
+  const q = new URLSearchParams(location.search);
+  const onNew = page === "shop" && q.get("filter") === "nieuw";
+  const onAcc = page === "shop" && q.get("cat") === "Accessoires";
+  const newCount = PRODUCTS.filter(p => p.isNew).length;
   const links = NAV.map(([href, label, key]) => {
-    const active = key === "nieuw" ? onNew : key === page && !(key === "shop" && onNew);
-    return `<a href="${href}"${active ? ' aria-current="page"' : ""}><span>${label}</span></a>`;
+    const active = key === "nieuw" ? onNew : key === "acc" ? onAcc : key === page && !(key === "shop" && (onNew || onAcc));
+    return `<a href="${href}"${active ? ' aria-current="page"' : ""}><span data-scramble>${label}</span>${key === "nieuw" ? `<sup class="nav-count">${newCount}</sup>` : ""}</a>`;
   }).join("");
   const free = CONFIG.freeShippingFrom ? `Gratis verzending vanaf ${euro(CONFIG.freeShippingFrom)}` : "Verzending door heel Nederland";
 
