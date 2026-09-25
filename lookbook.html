@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Het OUTRUN-lookbook: zo draag je de items uit de drop.">
+<title>Lookbook · OUTRUN Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Archivo:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/data.js"></script>
+</head>
+<body data-page="lookbook">
+<div id="site-header"></div>
+
+<main>
+  <section class="page-head">
+    <div class="wrap">
+      <div class="crumbs"><a href="index.html">Home</a><span>/</span><span>Lookbook</span></div>
+      <h1>Lookbook</h1>
+      <p id="lookIntro"></p>
+    </div>
+  </section>
+
+  <div class="wrap looks" id="looks"></div>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="assets/site.js"></script>
+<script>
+$("lookIntro").textContent = `Zo draag je ${CONFIG.dropName}. Klik op een item om het te shoppen.`;
+$("looks").innerHTML = LOOKS.map((l, i) => {
+  const items = l.products.map(productById).filter(Boolean);
+  return `<figure class="look" style="margin:0 0 20px">
+    <img src="${l.img}" alt="Look ${i + 1}: ${esc(l.title)}" loading="${i < 3 ? "eager" : "lazy"}">
+    <figcaption>
+      <span class="eyebrow" style="color:#fff;opacity:.8">Look ${String(i + 1).padStart(2, "0")}</span>
+      <b>${esc(l.title)}</b>
+      <span class="look-links">${items.map(p => `<a href="${productUrl(p)}">${esc(p.name)} · ${isSoldOut(p) ? "uitverkocht" : euro(p.price)}</a>`).join("")}</span>
+    </figcaption>
+  </figure>`;
+}).join("");
+</script>
+<script src="assets/chatbot.js"></script>
+</body>
+</html>

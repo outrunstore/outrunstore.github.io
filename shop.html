@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="De hele OUTRUN-collectie: jassen, hoodies, T-shirts, trainingspakken, broeken, sneakers, petten, mutsen en accessoires.">
+<title>Shop · OUTRUN Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Archivo:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/data.js"></script>
+</head>
+<body data-page="shop">
+<div id="site-header"></div>
+
+<main>
+  <section class="page-head">
+    <div class="wrap">
+      <div class="crumbs"><a href="index.html">Home</a><span>/</span><span id="crumbCat">Shop</span></div>
+      <h1 id="shopTitle">Shop</h1>
+      <p id="shopIntro">Alles uit de drop. Doorgestreepte maten zijn uitverkocht. Staat jouw maat er niet tussen? <a href="aanvragen.html">Doe een aanvraag</a>.</p>
+    </div>
+  </section>
+
+  <div class="shop-bar">
+    <div class="wrap">
+      <div class="bar-row" id="catRow" role="group" aria-label="Filter op categorie"></div>
+      <div class="bar-tools">
+        <label class="search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input id="q" type="search" placeholder="Zoek in de shop" aria-label="Zoeken"></label>
+        <select class="select" id="size" aria-label="Filter op maat"></select>
+        <select class="select" id="sort" aria-label="Sorteren">
+          <option value="">Aanbevolen</option>
+          <option value="new">Nieuwste eerst</option>
+          <option value="low">Prijs laag - hoog</option>
+          <option value="high">Prijs hoog - laag</option>
+        </select>
+        <label class="toggle"><input type="checkbox" id="inStock"> Alleen op voorraad</label>
+        <span class="result-count" id="count" aria-live="polite"></span>
+      </div>
+    </div>
+  </div>
+
+  <section class="section" style="padding-top:28px">
+    <div class="wrap">
+      <div class="grid" id="grid"></div>
+      <div class="empty" id="empty" hidden>
+        <h3>Niks gevonden</h3>
+        <p>Probeer een andere maat of categorie. Of vraag het aan: wij zoeken het voor je.</p>
+        <p style="margin-top:16px"><button class="ghost-btn" id="reset" type="button">Filters wissen</button> <a class="snap-btn" href="aanvragen.html">Doe een aanvraag</a></p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="assets/site.js"></script>
+<script>
+const params = new URLSearchParams(location.search);
+const state = {
+  cat: CATS.includes(params.get("cat")) ? params.get("cat") : "Alles",
+  filter: params.get("filter") === "nieuw" ? "nieuw" : params.get("filter") === "sale" ? "sale" : "",
+  size: params.get("size") || "",
+  sort: params.get("sort") || "",
+  stock: params.get("stock") === "1",
+  q: params.get("q") || ""
+};
+
+/* alle maten, in logische volgorde */
+const ORDER = ["S", "M", "L", "XL", "40", "41", "42", "43", "44", "45", "One size"];
+const allSizes = [...new Set(PRODUCTS.flatMap(sizesOf))].sort((a, b) => ORDER.indexOf(a) - ORDER.indexOf(b));
+$("size").innerHTML = `<option value="">Alle maten</option>` + allSizes.map(s => `<option value="${s}">Maat ${s}</option>`).join("");
+
+function renderCats(){
+  const chips = [["Alles", "Alles"], ...CATS.map(c => [c, c])];
+  $("catRow").innerHTML =
+    chips.map(([v, l]) => `<button class="chip" data-cat="${v}" aria-pressed="${!state.filter && state.cat === v}">${l}</button>`).join("") +
+    `<span class="sep"></span>` +
+    `<button class="chip" data-filter="nieuw" aria-pressed="${state.filter === "nieuw"}">Nieuw</button>` +
+    `<button class="chip" data-filter="sale" aria-pressed="${state.filter === "sale"}">Sale</button>`;
+}
+
+function render(){
+  let list = PRODUCTS.filter(p =>
+    (state.cat === "Alles" || p.cat === state.cat) &&
+    (state.filter !== "nieuw" || p.isNew) &&
+    (state.filter !== "sale" || p.was) &&
+    (!state.size || sizesOf(p).includes(state.size) && (!state.stock || p.colors.some(c => c.stock[state.size] > 0))) &&
+    (!state.stock || (!isSoldOut(p) && !p.soon)) &&
+    (!state.q || (p.name + " " + p.cat + " " + p.colors.map(c => c.n).join(" ")).toLowerCase().includes(state.q.toLowerCase()))
+  );
+  if (state.sort === "low") list.sort((a, b) => a.price - b.price);
+  else if (state.sort === "high") list.sort((a, b) => b.price - a.price);
+  else if (state.sort === "new") list.sort((a, b) => (b.isNew || b.soon ? 1 : 0) - (a.isNew || a.soon ? 1 : 0));
+  else list.sort((a, b) => (isSoldOut(a) ? 1 : 0) - (isSoldOut(b) ? 1 : 0)); /* uitverkocht achteraan */
+
+  $("grid").innerHTML = list.map(card).join("");
+  $("empty").hidden = list.length > 0;
+  $("count").textContent = `${list.length} ${list.length === 1 ? "item" : "items"}`;
+
+  const title = state.filter === "nieuw" ? "Nieuw" : state.filter === "sale" ? "Sale" : state.cat === "Alles" ? "Shop" : state.cat;
+  $("shopTitle").textContent = title;
+  $("crumbCat").textContent = title;
+  document.title = `${title} · OUTRUN Store`;
+
+  /* URL bijwerken zodat je de gefilterde pagina kunt delen */
+  const u = new URLSearchParams();
+  if (state.cat !== "Alles") u.set("cat", state.cat);
+  if (state.filter) u.set("filter", state.filter);
+  if (state.size) u.set("size", state.size);
+  if (state.sort) u.set("sort", state.sort);
+  if (state.stock) u.set("stock", "1");
+  if (state.q) u.set("q", state.q);
+  history.replaceState(null, "", location.pathname + (u.toString() ? "?" + u : ""));
+}
+
+$("catRow").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.cat){ state.cat = b.dataset.cat; state.filter = ""; }
+  else { state.filter = state.filter === b.dataset.filter ? "" : b.dataset.filter; state.cat = "Alles"; }
+  renderCats(); render();
+});
+$("size").value = state.size; $("sort").value = state.sort; $("inStock").checked = state.stock; $("q").value = state.q;
+$("size").addEventListener("change", e => { state.size = e.target.value; render(); });
+$("sort").addEventListener("change", e => { state.sort = e.target.value; render(); });
+$("inStock").addEventListener("change", e => { state.stock = e.target.checked; render(); });
+$("q").addEventListener("input", e => { state.q = e.target.value.trim(); render(); });
+$("reset").addEventListener("click", () => {
+  Object.assign(state, {cat:"Alles", filter:"", size:"", sort:"", stock:false, q:""});
+  $("size").value = ""; $("sort").value = ""; $("inStock").checked = false; $("q").value = "";
+  renderCats(); render();
+});
+renderCats(); render();
+</script>
+<script src="assets/chatbot.js"></script>
+</body>
+</html>

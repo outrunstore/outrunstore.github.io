@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Maattabellen van OUTRUN voor tops, jassen, broeken en sneakers, plus een maatcalculator op basis van je lengte.">
+<title>Maten · OUTRUN Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Archivo:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/data.js"></script>
+</head>
+<body data-page="maten">
+<div id="site-header"></div>
+
+<main>
+  <section class="page-head">
+    <div class="wrap">
+      <div class="crumbs"><a href="index.html">Home</a><span>/</span><span>Maten</span></div>
+      <h1>Maten</h1>
+      <p>Onze hoodies, jassen en trainingspakken vallen oversized. Wil je een strakkere fit? Pak dan een maat kleiner. Sneakers vallen normaal.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap two-col">
+      <div class="calc">
+        <div class="eyebrow" style="color:inherit;opacity:.8">Maatcalculator</div>
+        <h2>Welke maat past mij?</h2>
+        <p>Vul je lengte in en kies hoe je 'm wilt dragen.</p>
+        <div class="calc-row">
+          <input id="cm" type="number" inputmode="numeric" min="140" max="210" placeholder="Lengte in cm" aria-label="Je lengte in centimeters">
+          <select id="fit" aria-label="Pasvorm">
+            <option value="0">Oversized (zoals bedoeld)</option>
+            <option value="-1">Strakker</option>
+            <option value="1">Extra ruim</option>
+          </select>
+        </div>
+        <output id="out" for="cm fit">—<small>Vul je lengte in</small></output>
+      </div>
+
+      <div class="stack">
+        <h2>Zo meet je</h2>
+        <details open><summary>Borstomvang</summary><p>Leg een hoodie of T-shirt die goed zit plat op tafel. Meet van oksel tot oksel en doe dat keer twee.</p></details>
+        <details><summary>Lengte</summary><p>Meet van het hoogste punt van de schouder, naast de kraag, recht naar beneden tot de onderkant.</p></details>
+        <details><summary>Taille en binnenbeen</summary><p>Meet de taille van een broek die goed zit, plat gemeten, en doe dat keer twee. Het binnenbeen meet je van het kruis tot de onderkant van de pijp.</p></details>
+        <details><summary>Voetlengte</summary><p>Zet je hiel tegen de muur, zet een streep bij je langste teen en meet in centimeters. Kijk daarna in de sneakertabel.</p></details>
+        <p class="note">Twijfel je nog? Stuur ons je lengte op Snap (<strong class="snapname"></strong>) of vraag het aan de chatbot.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="wrap two-col">
+      <div class="stack" id="tops">
+        <h2>Hoodies, T-shirts en jassen</h2>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Maat</th><th>Borst (cm)</th><th>Lengte (cm)</th><th>Past bij lengte</th></tr></thead>
+          <tbody>
+            <tr><td>S</td><td>104</td><td>68</td><td>165-172</td></tr>
+            <tr><td>M</td><td>110</td><td>70</td><td>172-178</td></tr>
+            <tr><td>L</td><td>116</td><td>72</td><td>178-184</td></tr>
+            <tr><td>XL</td><td>122</td><td>74</td><td>184-190</td></tr>
+          </tbody>
+        </table></div>
+        <p class="note">Gemeten plat over de borst x2. De Boxy Tee is 4 cm korter, de Night Biker valt een maat kleiner.</p>
+      </div>
+      <div class="stack" id="broeken">
+        <h2>Broeken en trainingspakken</h2>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>Maat</th><th>Taille (cm)</th><th>Heup (cm)</th><th>Binnenbeen (cm)</th></tr></thead>
+          <tbody>
+            <tr><td>S</td><td>72-78</td><td>94</td><td>76</td></tr>
+            <tr><td>M</td><td>78-84</td><td>100</td><td>78</td></tr>
+            <tr><td>L</td><td>84-90</td><td>106</td><td>80</td></tr>
+            <tr><td>XL</td><td>90-96</td><td>112</td><td>82</td></tr>
+          </tbody>
+        </table></div>
+        <p class="note">Joggers en trainingsbroeken hebben een elastische taille met koord, dus ze rekken ongeveer 6 cm mee.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="wrap two-col">
+      <div class="stack" id="schoenen">
+        <h2>Sneakers</h2>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>EU</th><th>UK</th><th>US</th><th>Voetlengte (cm)</th></tr></thead>
+          <tbody>
+            <tr><td>40</td><td>6</td><td>7</td><td>25,0</td></tr>
+            <tr><td>41</td><td>7</td><td>8</td><td>25,8</td></tr>
+            <tr><td>42</td><td>8</td><td>9</td><td>26,5</td></tr>
+            <tr><td>43</td><td>9</td><td>10</td><td>27,3</td></tr>
+            <tr><td>44</td><td>9,5</td><td>10,5</td><td>28,0</td></tr>
+            <tr><td>45</td><td>10,5</td><td>11,5</td><td>28,8</td></tr>
+          </tbody>
+        </table></div>
+        <p class="note">Zit je tussen twee maten? Kies de grotere.</p>
+      </div>
+      <div class="stack">
+        <h2>Petten, mutsen en tassen</h2>
+        <p class="muted" style="margin:0">Allemaal one size. Petten hebben een verstelbare sluiting en passen een hoofdomtrek van 54 tot 61 cm. De beanie is van dikke rib en rekt mee. De Sling Bag heeft een verstelbare band.</p>
+        <p style="margin:0"><a class="ghost-btn" href="shop.html?size=One%20size">Bekijk one size items</a></p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="assets/site.js"></script>
+<script>
+const SIZES = ["S", "M", "L", "XL"];
+function calc(){
+  const cm = +$("cm").value, shift = +$("fit").value, out = $("out");
+  if (!cm || cm < 140 || cm > 210){ out.innerHTML = "—<small>Vul je lengte in (140-210 cm)</small>"; return; }
+  let i = cm < 172 ? 0 : cm < 178 ? 1 : cm < 184 ? 2 : 3;
+  i = Math.min(3, Math.max(0, i + shift));
+  const s = SIZES[i];
+  const extra = cm > 190 ? " Ben je langer dan 1,90 m? Snap ons even, dan checken we de lengte." : cm < 165 ? " Alles valt ruim, dus S is prima." : "";
+  const free = PRODUCTS.filter(p => sizesOf(p).includes(s) && !p.soon && p.colors.some(c => c.stock[s] > 0)).length;
+  out.innerHTML = `Maat ${s}<small>${free} items op voorraad in ${s}. <a href="shop.html?size=${s}&stock=1" style="color:inherit;font-weight:700">Bekijk ze →</a>${extra}</small>`;
+}
+$("cm").addEventListener("input", calc);
+$("fit").addEventListener("change", calc);
+</script>
+<script src="assets/chatbot.js"></script>
+</body>
+</html>

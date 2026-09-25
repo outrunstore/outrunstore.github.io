@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Niet gevonden wat je zoekt? Doe een aanvraag bij OUTRUN met een omschrijving en foto's.">
+<title>Aanvragen · OUTRUN Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Archivo:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/data.js"></script>
+</head>
+<body data-page="aanvragen">
+<div id="site-header"></div>
+
+<main>
+  <section class="page-head">
+    <div class="wrap">
+      <div class="crumbs"><a href="index.html">Home</a><span>/</span><span>Aanvragen</span></div>
+      <h1>Aanvragen</h1>
+      <p>Zoek je een item, kleur of maat die er niet tussen staat, of is iets uitverkocht? Omschrijf het en stuur er een foto bij. Wij zoeken het voor je en laten je weten wat het kost.</p>
+    </div>
+  </section>
+
+  <div class="wrap ask-grid">
+    <div class="ask-card" id="aanvragen">
+      <div class="eyebrow">Niet gevonden wat je zoekt?</div>
+      <h2>Doe een aanvraag</h2>
+      <div class="req-done" id="reqDone" hidden>
+        <strong>Aanvraag binnen!</strong> We gaan ermee aan de slag en snappen je zo snel mogelijk terug.
+      </div>
+      <form class="req" id="reqForm" method="POST" enctype="multipart/form-data">
+        <input type="hidden" name="_subject" value="Nieuwe aanvraag via de OUTRUN-site">
+        <input type="hidden" name="_template" value="table">
+        <input type="hidden" name="_next" id="reqNext" value="">
+        <input type="text" name="_honey" class="req-honey" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <label class="req-field"><span>Je Snapchat-naam</span><input id="reqSnap" name="Snapchat" type="text" required autocomplete="off" placeholder="Zodat we je kunnen terugsnappen"></label>
+        <label class="req-field"><span>Wat zoek je?</span><textarea id="reqText" name="Aanvraag" rows="3" required placeholder="Bijv. een zwarte puffer met capuchon, oversized"></textarea></label>
+        <div class="req-row">
+          <label class="req-field"><span>Soort item (optioneel)</span>
+            <select name="Categorie" id="reqCat"><option value="">Maakt niet uit</option></select>
+          </label>
+          <label class="req-field"><span>Maat (optioneel)</span><input id="reqSize" name="Maat" type="text" autocomplete="off" placeholder="Bijv. L, 43 of one size"></label>
+        </div>
+        <div class="req-field">
+          <span>Foto's (optioneel, max 3)</span>
+          <label class="req-pick" for="reqPick">+ Foto's toevoegen</label>
+          <input id="reqPick" type="file" accept="image/*" multiple class="req-file">
+          <div class="req-thumbs" id="reqThumbs"></div>
+          <div id="reqFiles" hidden></div>
+        </div>
+        <button class="snap-btn req-submit" type="submit" id="reqSubmit">Verstuur aanvraag</button>
+        <p class="req-note">Liever via Snap? Stuur je foto naar <strong class="snapname"></strong>.</p>
+      </form>
+    </div>
+    <div class="ask-card ask-side">
+      <div class="eyebrow">Vragen?</div>
+      <h2>Snap, mail of chat</h2>
+      <p>Over maten, levering, ophalen of je bestelling: snap <span class="handle snapname"></span> of mail naar <span class="handle mailaddr"></span>. Of vraag het meteen aan onze chatbot, die is 24/7 online.</p>
+      <div class="ask-btns">
+        <button class="snap-btn" type="button" data-open-chat>Chat met de bot</button>
+        <a class="ghost-btn snaplink" href="#" target="_blank" rel="noopener">Open Snapchat</a>
+        <a class="ghost-btn" id="mailLink" href="#">Mail ons</a>
+      </div>
+      <div class="stack" style="margin-top:12px;width:100%">
+        <div class="eyebrow">Zo werkt het</div>
+        <div class="steps" style="grid-template-columns:1fr;border:0">
+          <div class="step" style="padding:12px 0;border-right:0"><b>1</b><div><h3>Stuur je aanvraag</h3><p>Omschrijf wat je zoekt, liefst met foto.</p></div></div>
+          <div class="step" style="padding:12px 0;border-right:0"><b>2</b><div><h3>Wij zoeken het</h3><p>We snappen je terug met de prijs en levertijd.</p></div></div>
+          <div class="step" style="padding:12px 0;border-right:0;border-bottom:0"><b>3</b><div><h3>Akkoord? Tikkie</h3><p>Na betaling bestellen we het voor je.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="assets/site.js"></script>
+<script>
+(() => {
+  const form = $("reqForm");
+  form.action = "https://formsubmit.co/" + CONFIG.email;
+  $("reqNext").value = (location.protocol.startsWith("http") ? location.origin + location.pathname : CONFIG.siteUrl + "aanvragen.html") + "#bedankt";
+  $("reqCat").innerHTML += CATS.map(c => `<option>${c}</option>`).join("");
+  $("mailLink").href = "mailto:" + CONFIG.email + "?subject=" + encodeURIComponent("Vraag via OUTRUN-site");
+
+  /* vooraf invullen vanaf een uitverkocht product: aanvragen.html?item=Core%20Hoodie */
+  const item = new URLSearchParams(location.search).get("item");
+  if (item) $("reqText").value = item;
+
+  const pick = $("reqPick"), thumbs = $("reqThumbs"), filesEl = $("reqFiles");
+  const MAX = 3, MAX_MB = 5;
+  let files = [];
+  function render(){
+    thumbs.innerHTML = "";
+    files.forEach((f, i) => {
+      const d = document.createElement("div"); d.className = "req-thumb";
+      const img = document.createElement("img"); img.alt = f.name; img.src = URL.createObjectURL(f);
+      const x = document.createElement("button"); x.type = "button"; x.textContent = "×"; x.setAttribute("aria-label", "Verwijder " + f.name);
+      x.onclick = () => { files.splice(i, 1); render(); };
+      d.append(img, x); thumbs.append(d);
+    });
+  }
+  pick.addEventListener("change", () => {
+    for (const f of pick.files){
+      if (!f.type.startsWith("image/")) continue;
+      if (f.size > MAX_MB * 1024 * 1024){ toast(`${f.name} is groter dan ${MAX_MB} MB`); continue; }
+      if (files.length >= MAX){ toast(`Maximaal ${MAX} foto's`); break; }
+      files.push(f);
+    }
+    pick.value = ""; render();
+  });
+  form.addEventListener("submit", e => {
+    if (form.querySelector(".req-honey").value){ e.preventDefault(); return; }
+    filesEl.innerHTML = "";
+    try {
+      files.forEach((f, i) => {
+        const dt = new DataTransfer(); dt.items.add(f);
+        const inp = document.createElement("input"); inp.type = "file"; inp.name = "Foto " + (i + 1); inp.files = dt.files;
+        filesEl.append(inp);
+      });
+    } catch(err){ /* oude browser: verstuur zonder foto's */ }
+    const btn = $("reqSubmit"); btn.textContent = "Versturen…"; btn.disabled = true;
+  });
+  if (location.hash === "#bedankt"){
+    $("reqDone").hidden = false;
+    form.hidden = true;
+    toast("Aanvraag verstuurd!", 4000);
+  }
+})();
+</script>
+<script src="assets/chatbot.js"></script>
+</body>
+</html>

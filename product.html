@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Product · OUTRUN Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Archivo:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/data.js"></script>
+</head>
+<body data-page="shop">
+<div id="site-header"></div>
+
+<main>
+  <div class="wrap" id="pdpWrap">
+    <div class="crumbs" style="padding-top:24px"><a href="index.html">Home</a><span>/</span><a href="shop.html">Shop</a><span>/</span><a id="crumbCat" href="shop.html"></a><span>/</span><span id="crumbName"></span></div>
+
+    <div class="pdp">
+      <div class="gallery">
+        <div class="thumbs" id="thumbs"></div>
+        <div class="main-img" id="mainImg"></div>
+      </div>
+
+      <div class="pdp-info">
+        <div>
+          <div class="eyebrow" id="pCat"></div>
+          <h1 id="pName"></h1>
+          <div class="pdp-price" id="pPrice"></div>
+        </div>
+        <p class="pdp-desc" id="pDesc"></p>
+
+        <div>
+          <div class="label"><span>Kleur: <b id="colorName"></b></span></div>
+          <div class="opts" id="colorOpts" role="group" aria-label="Kleur"></div>
+        </div>
+
+        <div>
+          <div class="label"><span>Maat<b id="sizePicked"></b></span><a href="maten.html">Maattabel</a></div>
+          <div class="opts" id="sizeOpts" role="group" aria-label="Maat"></div>
+        </div>
+
+        <p class="stock-msg" id="stockMsg"></p>
+
+        <div class="order-box">
+          <div class="label" style="margin:0"><span>Je bestelling</span></div>
+          <div class="code" id="orderText"></div>
+          <div class="order-btns">
+            <a class="snap-btn snaplink" id="orderSnap" href="#" target="_blank" rel="noopener"></a>
+            <button class="ghost-btn" id="copyBtn" type="button">Kopieer bestelling</button>
+          </div>
+          <p class="hint">Bestellen gaat via Snapchat. Kopieer je bestelling, open Snap en stuur 'm naar <strong class="snapname"></strong>. Je krijgt dan een Tikkie.</p>
+        </div>
+
+        <div>
+          <details open><summary>Productdetails</summary><ul id="pDetails"></ul></details>
+          <details><summary>Pasvorm en maat</summary><p id="pFit"></p></details>
+          <details><summary>Verzenden en betalen</summary><p>We versturen door heel Nederland met PostNL en track &amp; trace, binnen 1-2 werkdagen na betaling. Betalen gaat via Tikkie (iDEAL). Woon je in de buurt van Leiden? Dan kun je ook ophalen.</p></details>
+          <details><summary>Uitverkocht in jouw maat?</summary><p>Snap ons met het item, je kleur en maat. Dan laten we het je weten als er een restock komt, of we zoeken iets vergelijkbaars voor je via een <a id="reqLink" href="aanvragen.html">aanvraag</a>.</p></details>
+        </div>
+      </div>
+    </div>
+
+    <section style="padding-bottom:64px">
+      <div class="section-head"><div><div class="eyebrow">Meer van OUTRUN</div><h2>Past er goed bij</h2></div><a class="link-arrow" href="shop.html">Alles bekijken →</a></div>
+      <div class="grid" id="related"></div>
+    </section>
+  </div>
+
+  <div class="wrap empty" id="notFound" hidden>
+    <h3>Dit product bestaat niet (meer)</h3>
+    <p>Misschien is het uit de collectie gehaald. Kijk rond in de shop.</p>
+    <p style="margin-top:16px"><a class="snap-btn" href="shop.html">Naar de shop</a></p>
+  </div>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="assets/site.js"></script>
+<script>
+const params = new URLSearchParams(location.search);
+const p = productById(params.get("id"));
+
+if (!p){
+  $("pdpWrap").hidden = true; $("notFound").hidden = false;
+} else {
+  window.currentProduct = p; /* voor de chatbot */
+  $("reqLink").href = "aanvragen.html?item=" + encodeURIComponent(p.name + " ");
+  const sizes = sizesOf(p);
+  const oneSize = sizes.length === 1;
+  /* start op de eerste kleur die nog op voorraad is */
+  let ci = Math.max(0, p.colors.findIndex(c => colorTotal(c) > 0));
+  const wantColor = p.colors.findIndex(c => c.n.toLowerCase() === (params.get("kleur") || "").toLowerCase());
+  if (wantColor >= 0) ci = wantColor;
+  let size = oneSize ? sizes[0] : null;
+  const images = [...p.colors.map((c, i) => ({src:c.img, color:i})), ...(p.extra || []).map(src => ({src, color:null}))];
+  let imgIndex = ci;
+
+  document.title = `${p.name} · OUTRUN Store`;
+  $("crumbCat").textContent = p.cat; $("crumbCat").href = "shop.html?cat=" + encodeURIComponent(p.cat);
+  $("crumbName").textContent = p.name;
+  $("pCat").textContent = p.cat;
+  $("pName").textContent = p.name;
+  $("pPrice").innerHTML = priceHtml(p) + (p.was ? ` <span class="tag tag-accent" style="font-size:12px">Bespaar ${euro(p.was - p.price)}</span>` : "");
+  $("pDesc").textContent = p.desc;
+  $("pDetails").innerHTML = p.details.map(d => `<li>${esc(d)}</li>`).join("");
+  const fitNote = p.details.find(d => /fit|valt|size/i.test(d)) || "";
+  $("pFit").innerHTML = p.cat === "Schoenen" ? "Onze sneakers vallen normaal. Pak je eigen maat. Zit je tussen twee maten? Kies de grotere."
+    : oneSize ? "One size, past iedereen. De sluiting is verstelbaar."
+    : `${esc(fitNote)}. Twijfel je? Check de <a href="maten.html">maattabel</a> of vraag de chatbot om maatadvies op basis van je lengte.`;
+
+  function renderGallery(){
+    const img = images[imgIndex];
+    $("mainImg").className = "main-img" + (isSoldOut(p) ? " is-out" : "");
+    $("mainImg").innerHTML = badges(p) + `<img src="${img.src}" alt="${esc(p.name)}${img.color !== null ? " in " + esc(p.colors[img.color].n.toLowerCase()) : ""}">`;
+    $("thumbs").innerHTML = images.length > 1 ? images.map((im, i) =>
+      `<button type="button" data-img="${i}" aria-current="${i === imgIndex}" aria-label="Foto ${i + 1}"><img src="${im.src}" alt="" loading="lazy"></button>`).join("") : "";
+    $("thumbs").hidden = images.length < 2;
+    $("mainImg").parentElement.style.gridTemplateColumns = images.length < 2 ? "1fr" : "";
+  }
+
+  function render(){
+    const c = p.colors[ci];
+    $("colorName").textContent = c.n + (colorTotal(c) === 0 && !p.soon ? " (uitverkocht)" : "");
+    $("colorOpts").innerHTML = p.colors.map((col, i) => {
+      const out = colorTotal(col) === 0 && !p.soon;
+      return `<button type="button" class="opt${out ? " is-out" : ""}" data-color="${i}" aria-pressed="${i === ci}"><span class="sw" style="background:${col.hex}"></span>${esc(col.n)}</button>`;
+    }).join("");
+
+    /* geselecteerde maat niet meer op voorraad in deze kleur? dan loslaten */
+    if (size && !oneSize && !p.soon && !(c.stock[size] > 0)) size = null;
+    $("sizeOpts").innerHTML = sizes.map(s => {
+      const n = c.stock[s];
+      const out = !p.soon && !(n > 0);
+      const low = !out && !p.soon && n <= CONFIG.lowStock;
+      return `<button type="button" class="opt" data-size="${s}" aria-pressed="${s === size}" ${out ? 'disabled aria-label="' + s + ' uitverkocht"' : ""}>${s}${low ? `<span class="low">nog ${n}</span>` : ""}</button>`;
+    }).join("");
+    $("sizePicked").textContent = size && !oneSize ? `: ${size}` : "";
+
+    /* voorraadmelding */
+    const msg = $("stockMsg");
+    const colorOut = colorTotal(c) === 0;
+    if (p.soon){ msg.className = "stock-msg low"; msg.textContent = "Binnenkort binnen. Reserveer nu via Snap."; }
+    else if (isSoldOut(p)){ msg.className = "stock-msg out"; msg.textContent = "Helemaal uitverkocht. Snap ons voor een restock-melding."; }
+    else if (colorOut){ msg.className = "stock-msg out"; msg.textContent = `${c.n} is uitverkocht. Kies een andere kleur.`; }
+    else if (size){ const n = c.stock[size]; msg.className = "stock-msg" + (n <= CONFIG.lowStock ? " low" : ""); msg.textContent = n <= CONFIG.lowStock ? `Nog maar ${n} op voorraad in ${size === "One size" ? "deze kleur" : "maat " + size}` : `Op voorraad${oneSize ? "" : " in maat " + size}`; }
+    else { const free = sizes.filter(s => c.stock[s] > 0); msg.className = "stock-msg"; msg.textContent = `Op voorraad in ${free.join(", ")}. Kies je maat.`; }
+
+    /* bestelling */
+    const unavailable = !p.soon && (isSoldOut(p) || colorOut);
+    const order = p.soon
+      ? `Yo! Ik wil de ${p.name} in ${c.n.toLowerCase()} reserveren${size && !oneSize ? `, maat ${size}` : ""}.`
+      : unavailable
+      ? `Yo! Laat je het weten als de ${p.name} in ${c.n.toLowerCase()} weer binnen is?`
+      : `Yo! Ik wil de ${p.name} in ${c.n.toLowerCase()}${oneSize ? "" : `, maat ${size || "…"}`} (${euro(p.price)}).`;
+    $("orderText").textContent = order;
+    const needsSize = !p.soon && !unavailable && !size;
+    $("orderSnap").innerHTML = SNAP_ICON + (p.soon ? "Snap om te reserveren" : unavailable ? "Snap voor restock" : needsSize ? "Kies eerst je maat" : "Bestel via Snap");
+    $("orderSnap").toggleAttribute("aria-disabled", needsSize);
+    $("orderSnap").style.opacity = needsSize ? ".45" : "";
+    $("copyBtn").disabled = needsSize;
+    $("copyBtn").style.opacity = needsSize ? ".45" : "";
+  }
+
+  $("colorOpts").addEventListener("click", e => {
+    const b = e.target.closest("[data-color]"); if (!b) return;
+    ci = +b.dataset.color; imgIndex = ci; renderGallery(); render();
+  });
+  $("sizeOpts").addEventListener("click", e => {
+    const b = e.target.closest("[data-size]"); if (!b || b.disabled) return;
+    size = b.dataset.size; render();
+  });
+  $("thumbs").addEventListener("click", e => {
+    const b = e.target.closest("[data-img]"); if (!b) return;
+    imgIndex = +b.dataset.img;
+    if (images[imgIndex].color !== null){ ci = images[imgIndex].color; render(); }
+    renderGallery();
+  });
+  $("orderSnap").addEventListener("click", e => {
+    if ($("orderSnap").hasAttribute("aria-disabled")){ e.preventDefault(); toast("Kies eerst je maat"); return; }
+    navigator.clipboard && navigator.clipboard.writeText($("orderText").textContent).catch(() => {});
+  });
+  $("copyBtn").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText($("orderText").textContent); toast("Gekopieerd! Plak 'm in Snap"); }
+    catch(e){ toast("Kopiëren lukte niet, selecteer de tekst zelf"); }
+  });
+
+  renderGallery(); render();
+
+  /* gerelateerd: eerst dezelfde categorie, dan de rest, uitverkocht achteraan */
+  const others = PRODUCTS.filter(x => x.id !== p.id).sort((a, b) =>
+    (b.cat === p.cat) - (a.cat === p.cat) || isSoldOut(a) - isSoldOut(b));
+  $("related").innerHTML = others.slice(0, 4).map(card).join("");
+}
+</script>
+<script src="assets/chatbot.js"></script>
+</body>
+</html>

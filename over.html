@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Over OUTRUN: een eigen streetwear-label met kleine drops en eerlijke prijzen.">
+<title>Over ons · OUTRUN Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Archivo:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/data.js"></script>
+</head>
+<body data-page="over">
+<div id="site-header"></div>
+
+<main>
+  <section class="page-head">
+    <div class="wrap">
+      <div class="crumbs"><a href="index.html">Home</a><span>/</span><span>Over ons</span></div>
+      <h1>Over Outrun</h1>
+      <p>Een eigen streetwear-label. Geen dure merknamen, wel dezelfde look.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="about-img"><img src="img/look-rack.jpg" alt="Een rek vol jassen en shirts" loading="lazy"></div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="wrap two-col">
+      <div><div class="eyebrow">Ons verhaal</div><h2>Look duur, betaal eerlijk</h2></div>
+      <div class="prose">
+        <p>OUTRUN is begonnen met een simpele vraag: waarom moet een goede puffer of een zware hoodie zoveel kosten? Het antwoord is vaak het logo. Dat laten wij weg.</p>
+        <p>We brengen items uit in kleine drops. Dat houdt de prijs laag en zorgt ervoor dat niet iedereen op straat hetzelfde draagt. Op is op: is iets uitverkocht, dan is het weg, tenzij er genoeg vraag is voor een restock.</p>
+        <p>Bestellen gaat via Snapchat. Zo praat je direct met ons, krijg je eerlijk maatadvies en weet je zeker dat je item echt op voorraad is.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="wrap values">
+      <div class="value"><b>01</b><h3>Kleine drops</h3><p>Beperkte aantallen per item. Daardoor blijft het exclusief en verspillen we niks.</p></div>
+      <div class="value"><b>02</b><h3>Eerlijke prijs</h3><p>Je betaalt voor de kwaliteit en de fit, niet voor een merknaam.</p></div>
+      <div class="value"><b>03</b><h3>Direct contact</h3><p>Geen klantenservice-bots in de wacht. Snap ons en je praat met ons.</p></div>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
+    <div class="wrap">
+      <a class="banner" href="shop.html" style="text-decoration:none;min-height:320px">
+        <img src="img/core-zand.jpg" alt="" loading="lazy" style="object-position:center 30%">
+        <div class="banner-body">
+          <div class="eyebrow" id="dropLabel"></div>
+          <h2>Bekijk de collectie</h2>
+          <p>Van puffers tot beanies. Check wat er nog is voordat het op is.</p>
+          <span class="snap-btn">Naar de shop</span>
+        </div>
+      </a>
+    </div>
+  </section>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="assets/site.js"></script>
+<script>$("dropLabel").textContent = CONFIG.dropName + (CONFIG.dropLive ? " is live" : " komt eraan");</script>
+<script src="assets/chatbot.js"></script>
+</body>
+</html>
