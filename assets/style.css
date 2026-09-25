@@ -592,3 +592,106 @@ html.lenis,html.lenis body{height:auto}
 .lenis.lenis-stopped{overflow:clip}
 
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.intro-pending::after{display:none}}
+
+/* ====== CREATIEVE LAAG ====== */
+
+/* hero: fotospoor achter het logo */
+.hero{position:relative;overflow:hidden;isolation:isolate}
+.hero > .wrap{position:relative}
+.hero-mark{position:relative;z-index:1}
+.hero-top,.hero-grid,.trail-hint{position:relative;z-index:3}
+.trail{position:absolute;inset:0;z-index:2;pointer-events:none}
+.trail img{position:absolute;left:0;top:0;width:clamp(150px,13vw,210px);aspect-ratio:4/5;object-fit:cover;border-radius:6px;opacity:0;box-shadow:0 24px 50px -22px rgba(0,0,0,.5);will-change:transform,opacity}
+.trail-hint{display:none}
+.has-cursor .trail-hint{display:block;margin:22px 0 0;text-align:right;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
+/* ronde sticker met draaiende tekst */
+.hero-media{position:relative;min-width:0}
+.badge{position:absolute;left:-56px;top:-56px;z-index:3;width:124px;height:124px;border-radius:50%;background:var(--bg);display:grid;place-items:center;pointer-events:none;box-shadow:0 10px 30px -14px rgba(0,0,0,.35)}
+.badge svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.badge text{font-family:var(--mono);font-size:14.5px;font-weight:700;letter-spacing:.1em;fill:var(--ink)}
+.badge span{width:48px;height:48px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-size:18px}
+@media (max-width:900px){.badge{left:auto;right:14px;top:14px;width:96px;height:96px}.badge span{width:38px;height:38px;font-size:15px}}
+
+/* statement dat oplicht terwijl je scrolt */
+.statement{padding-block:88px 110px}
+.statement .eyebrow{margin-bottom:24px}
+.statement-text{margin:0;font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:clamp(40px,6.6vw,108px);line-height:.94;letter-spacing:-.005em;text-wrap:balance}
+.statement-text span{color:color-mix(in srgb,var(--ink) 15%,transparent);transition:color .4s ease}
+.statement-text span.lit{color:var(--ink)}
+.statement-text .acc,.statement-text em{font-style:italic;color:var(--accent)}
+.statement-text span.acc{color:color-mix(in srgb,var(--accent) 22%,transparent)}
+.statement-text span.acc.lit{color:var(--accent)}
+
+/* lookbook-strook die opzij schuift */
+.hscroll{padding-block:40px 64px}
+.hscroll-sticky{display:flex;flex-direction:column;justify-content:center}
+.hscroll .section-head{width:100%}
+.hscroll-track{display:flex;align-items:flex-start;gap:22px;padding-inline:max(20px,calc((100vw - 1240px) / 2 + 20px));overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding-bottom:8px}
+.hscroll-track::-webkit-scrollbar{display:none}
+.hpanel{flex:0 0 auto;width:min(76vw,360px);margin:0;scroll-snap-align:center;display:flex;flex-direction:column;gap:12px}
+.hpanel-img{position:relative;display:block;aspect-ratio:4/5;border-radius:var(--radius);overflow:hidden;background:var(--tile)}
+.hpanel-img img{width:116%;max-width:none;height:100%;object-fit:cover;margin-left:-8%}
+.hpanel figcaption{display:flex;flex-direction:column;gap:3px}
+.hpanel figcaption b{font-family:var(--display);font-size:30px;line-height:1;text-transform:uppercase;font-style:italic}
+.hpanel-items{font-size:13px;color:var(--muted)}
+.hpanel-end{aspect-ratio:4/5;justify-content:flex-end;border-radius:var(--radius);background:var(--accent);color:var(--accent-ink);text-decoration:none;padding:28px;font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:clamp(44px,4.4vw,72px);line-height:.88}
+.hpanel-end i{font-style:normal;margin-top:22px;width:62px;height:62px;border-radius:50%;background:var(--accent-ink);color:var(--accent);display:grid;place-items:center;font-size:24px;transition:transform .6s cubic-bezier(.2,.9,.1,1)}
+.hpanel-end:hover i{transform:rotate(-45deg)}
+.hscroll.is-pinned{padding:0}
+.hscroll.is-pinned .hscroll-sticky{position:sticky;top:0;height:100vh;overflow:hidden;gap:6px}
+.hscroll.is-pinned .hscroll-track{overflow:visible;scroll-snap-type:none;will-change:transform}
+.hscroll.is-pinned .hpanel{width:min(27vw,41vh)}
+.hscroll.is-pinned .hpanel:nth-child(even){margin-top:7vh}
+
+/* 3D-kantelen met lichtreflectie */
+.card-img,.hpanel-img{transition:transform .7s cubic-bezier(.2,.9,.1,1)}
+.card-img.tilt,.hpanel-img.tilt{transition:transform .12s linear}
+.card-img::after,.hpanel-img::after{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;background:radial-gradient(circle at var(--gx,50%) var(--gy,50%),rgba(255,255,255,.3),transparent 55%);opacity:0;transition:opacity .45s ease}
+.card-img.tilt::after,.hpanel-img.tilt::after{opacity:1}
+
+/* aftellen naar de volgende drop */
+.drop-cta{background:var(--ink);color:var(--bg);padding-block:96px;position:relative;overflow:hidden}
+.drop-cta .eyebrow{color:inherit;opacity:.6}
+.drop-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:56px;align-items:end}
+.drop-left h2{font-size:clamp(56px,8vw,120px);font-style:italic;margin:10px 0 30px}
+.countdown{display:flex;gap:clamp(16px,3vw,44px)}
+.countdown div{display:flex;flex-direction:column;gap:8px}
+.countdown b{display:inline-block;font-family:var(--display);font-weight:800;font-size:clamp(56px,7.4vw,112px);line-height:.85;font-variant-numeric:tabular-nums}
+.countdown div:last-child b{color:var(--accent)}
+.countdown b.flip{animation:flip .55s cubic-bezier(.2,.9,.1,1)}
+@keyframes flip{from{transform:translateY(-40%);opacity:0;filter:blur(5px)}}
+.countdown span{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.6}
+.live-now{font-family:var(--display);font-weight:800;font-size:clamp(48px,6vw,90px);color:var(--accent);text-transform:uppercase}
+.alert-form{display:flex;flex-direction:column;gap:14px}
+.alert-lead{margin:0;font-size:18px;line-height:1.45;opacity:.85;max-width:36ch}
+.alert-row{display:flex;gap:8px;border:1px solid color-mix(in srgb,var(--bg) 25%,transparent);border-radius:999px;padding:6px;transition:border-color .3s ease}
+.alert-row:focus-within{border-color:var(--bg)}
+.alert-row input{flex:1;min-width:0;background:transparent;border:0;color:var(--bg);font:inherit;font-size:16px;padding:0 14px;outline:none}
+.alert-row input::placeholder{color:color-mix(in srgb,var(--bg) 45%,transparent)}
+.alert-row .snap-btn{padding:13px 22px}
+.alert-note{margin:0;font-size:13px;opacity:.6}
+.alert-note.is-ok{opacity:1;color:#35D07F}
+.alert-note.is-error{opacity:1;color:#FF8A5B}
+.alert-form.is-done .alert-row{border-color:#35D07F}
+@media (max-width:900px){.drop-grid{grid-template-columns:1fr;gap:40px}.drop-cta{padding-block:72px}}
+@media (max-width:600px){.alert-row{flex-direction:column;border-radius:16px}.alert-row input{padding:12px}}
+
+/* reuzenlogo in de footer: letters springen bij hover */
+.foot-mark-wrap{padding-top:70px;overflow:hidden}
+.foot-mark{display:inline-block;font-family:var(--display);font-weight:900;font-style:italic;text-transform:uppercase;line-height:.8;color:var(--ink);text-decoration:none;white-space:nowrap;transform:skewX(-6deg);transform-origin:left bottom;padding-bottom:.02em}
+.foot-mark span{display:inline-block;transition:translate 1.1s cubic-bezier(.2,.9,.1,1) var(--dl,0ms),transform .6s cubic-bezier(.2,.9,.1,1),color .3s ease}
+.foot-mark span.acc{color:var(--accent)}
+.foot-mark span:hover{transform:translateY(-16%) rotate(-5deg)}
+.foot-mark span:nth-child(2){--dl:60ms}.foot-mark span:nth-child(3){--dl:120ms}.foot-mark span:nth-child(4){--dl:180ms}.foot-mark span:nth-child(5){--dl:240ms}.foot-mark span:nth-child(6){--dl:300ms}
+.motion .foot-mark.rise span{translate:0 105%}
+.motion .foot-mark.rise.is-in span{translate:0 0}
+footer{margin-top:0}
+
+/* filmkorrel */
+.grain{position:fixed;left:-50%;top:-50%;width:200%;height:200%;z-index:250;pointer-events:none;opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:grain .9s steps(5) infinite}
+@keyframes grain{0%{transform:translate(0,0)}20%{transform:translate(-4%,3%)}40%{transform:translate(3%,-5%)}60%{transform:translate(-2%,6%)}80%{transform:translate(5%,2%)}100%{transform:translate(0,0)}}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .grain{opacity:.07}}
+:root[data-theme="dark"] .grain{opacity:.07}

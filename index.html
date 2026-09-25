@@ -19,7 +19,7 @@
 <div id="site-header"></div>
 
 <main>
-  <section class="hero">
+  <section class="hero" id="hero">
     <div class="wrap">
       <div class="hero-top" data-enter style="--i:0">
         <span class="eyebrow">Streetwear · verzending door heel Nederland</span>
@@ -35,17 +35,32 @@
           </div>
           <div class="stats" id="stats"></div>
         </div>
-        <a class="hero-img" href="lookbook.html" data-cursor="Lookbook →">
-          <img src="img/look-hero.jpg" alt="Twee jongens in zwarte OUTRUN-streetwear tegen een blauwe lucht" fetchpriority="high">
-          <div class="caption"><div><div class="eyebrow">Lookbook · Look 01</div><b>Night shift</b></div><span class="round-arrow" aria-hidden="true">↗</span></div>
-        </a>
+        <div class="hero-media">
+          <a class="hero-img" href="lookbook.html" data-cursor="Lookbook →">
+            <img src="img/look-hero.jpg" alt="Twee jongens in zwarte OUTRUN-streetwear tegen een blauwe lucht" fetchpriority="high">
+            <div class="caption"><div><div class="eyebrow">Lookbook · Look 01</div><b>Night shift</b></div><span class="round-arrow" aria-hidden="true">↗</span></div>
+          </a>
+          <div class="badge" aria-hidden="true">
+            <svg viewBox="0 0 200 200"><defs><path id="badgeCircle" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0"/></defs>
+              <text><textPath href="#badgeCircle" textLength="486">OUTRUN · LOOK DUUR · BETAAL EERLIJK · OP IS OP ·</textPath></text></svg>
+            <span>✦</span>
+          </div>
+        </div>
       </div>
+      <p class="trail-hint" aria-hidden="true">Beweeg je muis over de pagina ↯</p>
     </div>
   </section>
 
   <div class="marquee" aria-hidden="true"><div class="marquee-track" id="marquee"></div></div>
 
-  <section class="section">
+  <section class="statement">
+    <div class="wrap">
+      <div class="eyebrow">Waarom OUTRUN</div>
+      <p class="statement-text" data-scrub>Geen logo's. Geen hype-prijzen. Gewoon streetwear die net zo hard gaat als <em>jij.</em> Kleine drops, eerlijke prijzen, en <em>op is op.</em></p>
+    </div>
+  </section>
+
+  <section class="section" style="padding-top:0">
     <div class="wrap">
       <div class="section-head">
         <div><div class="eyebrow">Categorieën</div><h2>Shop per stijl</h2></div>
@@ -65,13 +80,15 @@
     </div>
   </section>
 
-  <div class="wrap">
-    <div class="steps" aria-label="Zo bestel je">
-      <div class="step"><b>1</b><div><h3>Kies je item</h3><p>Kies je kleur en maat en leg het in je winkelmand.</p></div></div>
-      <div class="step"><b>2</b><div><h3>Reken af</h3><p>Vul je gegevens in en kies verzenden of ophalen.</p></div></div>
-      <div class="step"><b>3</b><div><h3>Betaal en ontvang</h3><p>Betaal met iDEAL en je bestelling ligt binnen 1-2 werkdagen bij je.</p></div></div>
+  <section class="hscroll" data-hscroll aria-label="Lookbook">
+    <div class="hscroll-sticky">
+      <div class="wrap section-head">
+        <div><div class="eyebrow">Lookbook · <span id="lookCount"></span> looks</div><h2>Zo draag je 'm</h2></div>
+        <a class="link-arrow" href="lookbook.html">Hele lookbook →</a>
+      </div>
+      <div class="hscroll-track" id="hTrack"></div>
     </div>
-  </div>
+  </section>
 
   <section class="section">
     <div class="wrap">
@@ -97,12 +114,37 @@
     </div>
   </section>
 
-  <section class="section" style="padding-top:0">
-    <div class="wrap usps">
-      <div class="usp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.5"/><circle cx="17" cy="17.5" r="1.5"/></svg><h3>1-2 werkdagen</h3><p>Verzending door heel Nederland met PostNL en track &amp; trace.</p></div>
-      <div class="usp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/></svg><h3>Betalen met iDEAL</h3><p>Na je bestelling krijg je een betaalverzoek. Pas na betaling versturen we.</p></div>
-      <div class="usp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><h3>Gratis ophalen in Leiden</h3><p>Woon je in de buurt? Kies bij het afrekenen voor ophalen.</p></div>
-      <div class="usp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="7" width="16" height="12" rx="3"/><path d="M12 7V4M9 12h.01M15 12h.01M9 16h6"/></svg><h3>Chatbot 24/7</h3><p>Maatadvies, voorraad en prijzen. Onze bot weet het meteen.</p></div>
+  <section class="drop-cta" id="dropAlert">
+    <div class="wrap drop-grid">
+      <div class="drop-left">
+        <div class="eyebrow">Volgende drop</div>
+        <h2 id="nextName"></h2>
+        <div class="countdown" id="countdown">
+          <div><b data-u="d">00</b><span>dagen</span></div>
+          <div><b data-u="h">00</b><span>uur</span></div>
+          <div><b data-u="m">00</b><span>min</span></div>
+          <div><b data-u="s">00</b><span>sec</span></div>
+        </div>
+      </div>
+      <form class="alert-form" id="alertForm" novalidate>
+        <p class="alert-lead">Mis 'm niet. Laat je mail achter en je hoort het als eerste als de drop live gaat.</p>
+        <div class="alert-row">
+          <input type="email" name="email" id="alertMail" required autocomplete="email" placeholder="jouw@email.nl" aria-label="Je e-mailadres">
+          <button class="snap-btn" type="submit" id="alertBtn">Zet me op de lijst</button>
+        </div>
+        <input type="text" name="_honey" class="req-honey" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <p class="alert-note" id="alertNote">Geen spam. Alleen een mail als er iets nieuws dropt.</p>
+      </form>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="steps" aria-label="Zo bestel je">
+        <div class="step"><b>1</b><div><h3>Kies je item</h3><p>Kies je kleur en maat en leg het in je winkelmand.</p></div></div>
+        <div class="step"><b>2</b><div><h3>Reken af</h3><p>Vul je gegevens in en kies verzenden of ophalen.</p></div></div>
+        <div class="step"><b>3</b><div><h3>Betaal en ontvang</h3><p>Betaal met iDEAL en je bestelling ligt binnen 1-2 werkdagen bij je.</p></div></div>
+      </div>
     </div>
   </section>
 </main>
@@ -126,6 +168,61 @@ $("cats").innerHTML = CATS.map(c => {
 
 $("newGrid").innerHTML = PRODUCTS.filter(p => p.isNew).slice(0, 4).map(card).join("");
 $("lastGrid").innerHTML = PRODUCTS.filter(p => !p.soon && !isSoldOut(p)).sort((a, b) => productTotal(a) - productTotal(b)).slice(0, 4).map(card).join("");
+
+/* lookbook: horizontale strook */
+$("lookCount").textContent = LOOKS.length;
+$("hTrack").innerHTML = LOOKS.map((l, i) => {
+  const items = l.products.map(productById).filter(Boolean);
+  return `<figure class="hpanel">
+    <a class="hpanel-img" href="${items[0] ? productUrl(items[0]) : "lookbook.html"}" data-cursor="Shop de look"><img src="${l.img}" alt="Look ${i + 1}: ${esc(l.title)}" loading="lazy"></a>
+    <figcaption><span class="eyebrow">Look ${String(i + 1).padStart(2, "0")}</span><b>${esc(l.title)}</b><span class="hpanel-items">${items.map(p => esc(p.name)).join(" · ")}</span></figcaption>
+  </figure>`;
+}).join("") + `<a class="hpanel hpanel-end" href="lookbook.html" data-cursor="Open →"><span>Hele<br>lookbook</span><i aria-hidden="true">→</i></a>`;
+
+/* aftellen naar de volgende drop */
+(() => {
+  const nd = CONFIG.nextDrop;
+  if (!nd){ $("dropAlert").hidden = true; return; }
+  $("nextName").textContent = nd.name;
+  const end = new Date(nd.date).getTime();
+  const els = {}; document.querySelectorAll("#countdown b").forEach(b => els[b.dataset.u] = b);
+  function tick(){
+    let s = Math.max(0, Math.floor((end - Date.now()) / 1000));
+    if (s === 0){ $("countdown").innerHTML = `<div class="live-now">${esc(nd.name)} is live</div>`; return; }
+    const v = { d: Math.floor(s / 86400), h: Math.floor(s % 86400 / 3600), m: Math.floor(s % 3600 / 60), s: s % 60 };
+    for (const k in v){
+      const t = String(v[k]).padStart(2, "0");
+      if (els[k].textContent !== t){ els[k].textContent = t; els[k].classList.remove("flip"); void els[k].offsetWidth; els[k].classList.add("flip"); }
+    }
+    setTimeout(tick, 1000 - Date.now() % 1000);
+  }
+  tick();
+
+  /* aanmelden voor de drop-alert */
+  $("alertForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    const f = e.target, note = $("alertNote"), btn = $("alertBtn");
+    if (f._honey.value) return;
+    if (!f.email.checkValidity()){ note.textContent = "Vul een geldig e-mailadres in."; note.className = "alert-note is-error"; f.email.focus(); return; }
+    btn.disabled = true; btn.textContent = "Even geduld…";
+    try {
+      const res = await fetch("https://formsubmit.co/ajax/" + CONFIG.email, {
+        method: "POST", headers: {"Content-Type": "application/json", "Accept": "application/json"},
+        body: JSON.stringify({ _subject: `Drop-alert: nieuwe aanmelding voor ${nd.name}`, _template: "table", _captcha: "false",
+          _autoresponse: `Je staat op de lijst voor ${nd.name}! Zodra de drop live gaat, hoor je het als eerste. Op is op.`,
+          email: f.email.value, Drop: nd.name })
+      });
+      const out = await res.json().catch(() => ({}));
+      if (!res.ok || String(out.success) !== "true") throw new Error();
+      f.classList.add("is-done");
+      note.className = "alert-note is-ok"; note.textContent = `Je staat op de lijst voor ${nd.name}. Check je mail.`;
+      btn.textContent = "✓ Op de lijst";
+    } catch(err){
+      note.className = "alert-note is-error"; note.textContent = "Dat lukte niet. Probeer het zo nog eens.";
+      btn.disabled = false; btn.textContent = "Zet me op de lijst";
+    }
+  });
+})();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js"></script>
 <script src="assets/motion.js"></script>

@@ -30,6 +30,16 @@
   }
   document.querySelectorAll("main h1, main h2").forEach(split);
 
+  /* statement: elk woord licht op terwijl je scrolt; <em> wordt accentkleur */
+  const scrubs = [...document.querySelectorAll("[data-scrub]")].map(el => {
+    const out = [];
+    el.childNodes.forEach(n => n.textContent.trim().split(/\s+/).filter(Boolean).forEach(w => out.push(`<span${n.nodeType === 1 ? ' class="acc"' : ""}>${esc(w)}</span>`)));
+    el.setAttribute("aria-label", el.textContent.replace(/\s+/g, " ").trim());
+    el.innerHTML = out.join(" ");
+    [...el.children].forEach(c => c.setAttribute("aria-hidden", "true"));
+    return { el, words: [...el.children] };
+  });
+
   /* ---------- scroll-reveal ---------- */
   const REVEAL = ".section-head, .card, .cat, .usp, .step, .value, .look, .faq-group, .tbl-wrap, .calc, .stack, .ask-card, .prose p, .pdp-info > *, .stats > div, .co-card, .page-head p, .crumbs, .hero-copy > *";
   const IMG_REVEAL = ".hero-img, .banner, .about-img, .main-img";
@@ -64,6 +74,7 @@
     ready();
     document.querySelectorAll(".reveal:not(.is-in), .reveal-img:not(.is-in)").forEach(el => io.observe(el));
     document.querySelectorAll(".split:not(.is-in)").forEach(el => headIO.observe(el));
+    document.querySelectorAll(".foot-mark").forEach(el => { el.classList.add("rise"); headIO.observe(el); });
   }
 
   /* ---------- startanimatie (eerste bezoek) ---------- */
@@ -168,6 +179,19 @@
   document.body.append(pbar);
   let lastY = scrollY, ticking = false;
   const para = [...document.querySelectorAll(".hero-img img, .banner img, .about-img img")];
+
+  /* lookbook-strook: de pagina "pint" en de looks schuiven opzij terwijl je scrolt (alleen op brede schermen) */
+  const hs = document.querySelector("[data-hscroll]"), hTrack = hs && hs.querySelector(".hscroll-track");
+  let hDist = 0;
+  function sizeH(){
+    if (!hs) return;
+    const on = innerWidth > 900;
+    hs.classList.toggle("is-pinned", on);
+    if (!on){ hs.style.height = ""; hTrack.style.transform = ""; return; }
+    hDist = Math.max(0, hTrack.scrollWidth - innerWidth);
+    hs.style.height = innerHeight + hDist + "px";
+  }
+  if (hs){ sizeH(); addEventListener("resize", sizeH); addEventListener("load", sizeH); }
   function onScroll(){
     const y = scrollY, max = document.documentElement.scrollHeight - innerHeight;
     pbar.style.transform = `scaleX(${max > 0 ? y / max : 0})`;
@@ -178,6 +202,21 @@
     }
     lastY = y;
     const vh = innerHeight;
+    if (hs && hs.classList.contains("is-pinned")){
+      const r = hs.getBoundingClientRect();
+      const k = clamp(-r.top / (hDist || 1), 0, 1);
+      hTrack.style.transform = `translate3d(${(-k * hDist).toFixed(1)}px,0,0)`;
+      hTrack.querySelectorAll(".hpanel-img img").forEach(im => {
+        const b = im.parentElement.getBoundingClientRect();
+        im.style.translate = `${(((b.left + b.width / 2) / innerWidth - 0.5) * -10).toFixed(2)}% 0`;
+      });
+    }
+    scrubs.forEach(({ el, words }) => {
+      const r = el.getBoundingClientRect();
+      const k = clamp((vh * 0.85 - r.top) / (r.height + vh * 0.3), 0, 1);
+      const lit = Math.round(k * words.length * 1.08);
+      words.forEach((w, i) => w.classList.toggle("lit", i < lit));
+    });
     para.forEach(img => {
       const r = img.parentElement.getBoundingClientRect();
       if (r.bottom < 0 || r.top > vh) return;
@@ -190,6 +229,8 @@
 
   /* ---------- marquee die reageert op scrollsnelheid ---------- */
   const track = document.querySelector(".marquee-track");
+  const badge = document.querySelector(".badge svg");
+  let badgeA = 0;
   if (track){
     track.style.animation = "none";
     let x = 0, dir = 1, half = track.scrollWidth / 2, prevY = scrollY, vel = 0;
@@ -203,6 +244,7 @@
       if (x <= -half) x += half;
       if (x > 0) x -= half;
       track.style.transform = `translate3d(${x.toFixed(1)}px,0,0) skewX(${clamp(-vel * 0.5, -14, 14).toFixed(2)}deg)`;
+      if (badge){ badgeA += (0.25 + Math.min(Math.abs(vel) * 0.35, 9)) * dir; badge.style.transform = `rotate(${badgeA.toFixed(1)}deg)`; }
       requestAnimationFrame(loop);
     })();
   }
@@ -248,11 +290,11 @@
   });
 
   (function loop(){
-    let tx = mx, ty = my, k = 0.2;
+    let tx = mx, ty = my, k = 0.42;
     if (stick && stick.isConnected){
       const r = stick.getBoundingClientRect();
       const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
-      tx = cx + (mx - cx) * 0.1; ty = cy + (my - cy) * 0.1; k = 0.28;
+      tx = cx + (mx - cx) * 0.12; ty = cy + (my - cy) * 0.12; k = 0.45;
       shape.style.width = r.width + 10 + "px";
       shape.style.height = r.height + 10 + "px";
       shape.style.borderRadius = Math.min(r.height / 2 + 5, parseFloat(getComputedStyle(stick).borderTopLeftRadius) + 5) + "px";
@@ -261,11 +303,54 @@
     const vx = x - px, vy = y - py; px = x; py = y;
     const speed = Math.hypot(vx, vy);
     /* uitrekken in de bewegingsrichting (niet als hij om een knop zit of een label toont) */
-    const s = mode === "" || mode === "link" ? Math.min(speed / 60, 0.5) : 0;
+    const s = mode === "" || mode === "link" ? Math.min(speed / 110, 0.42) : 0;
     const ang = Math.atan2(vy, vx) * 180 / Math.PI;
     cur.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) rotate(${s ? ang.toFixed(1) : 0}deg) scale(${(1 + s).toFixed(3)}, ${(1 - s * 0.55).toFixed(3)})`;
     requestAnimationFrame(loop);
   })();
+
+  /* fotospoor: beweeg over de hero en er poppen productfoto's op achter het logo */
+  const hero = document.querySelector("#hero");
+  if (hero){
+    const srcs = PRODUCTS.map(p => p.colors[0].img).concat(LOOKS.map(l => l.img)).sort(() => Math.random() - 0.5);
+    const layer = document.createElement("div");
+    layer.className = "trail"; layer.setAttribute("aria-hidden", "true");
+    const pool = Array.from({ length: 14 }, () => { const im = document.createElement("img"); im.alt = ""; im.decoding = "async"; layer.append(im); return im; });
+    hero.prepend(layer);
+    hero.classList.add("has-trail");
+    let lx = null, ly = null, n = 0, z = 1, warm = false;
+    hero.addEventListener("mouseenter", () => { if (warm) return; warm = true; srcs.slice(0, 12).forEach(s => { const i = new Image(); i.src = s; }); });
+    hero.addEventListener("mousemove", e => {
+      const r = hero.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+      if (lx === null){ lx = x; ly = y; return; }
+      if (Math.hypot(x - lx, y - ly) < 95) return;
+      const ang = Math.atan2(y - ly, x - lx); lx = x; ly = y;
+      const im = pool[n % pool.length]; im.src = srcs[n % srcs.length]; n++;
+      im.style.left = x + "px"; im.style.top = y + "px"; im.style.zIndex = ++z;
+      const rot = rand(-12, 12), dx = Math.cos(ang) * 40, dy = Math.sin(ang) * 40;
+      im.getAnimations().forEach(a => a.cancel());
+      im.animate([
+        { opacity: 0, transform: `translate(-50%,-50%) scale(.3) rotate(${rot * 2}deg)` },
+        { opacity: 1, transform: `translate(-50%,-50%) scale(1) rotate(${rot}deg)`, offset: .16 },
+        { opacity: 1, transform: `translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px)) scale(1) rotate(${rot}deg)`, offset: .62 },
+        { opacity: 0, transform: `translate(calc(-50% + ${dx * 1.6}px),calc(-50% + ${dy * 1.6 + 30}px)) scale(.7) rotate(${rot}deg)` }
+      ], { duration: 1150, easing: "cubic-bezier(.2,.9,.1,1)", fill: "forwards" });
+    });
+  }
+
+  /* productfoto's kantelen naar de muis, met een lichtreflectie */
+  let tiltEl = null;
+  function untilt(el){ el.classList.remove("tilt"); el.style.transform = ""; }
+  document.addEventListener("mousemove", e => {
+    const ci = e.target.closest(".card-img, .hpanel-img");
+    if (tiltEl && tiltEl !== ci) untilt(tiltEl);
+    tiltEl = ci; if (!ci) return;
+    const r = ci.getBoundingClientRect(), px = (e.clientX - r.left) / r.width - 0.5, py = (e.clientY - r.top) / r.height - 0.5;
+    ci.classList.add("tilt");
+    ci.style.transform = `perspective(900px) rotateY(${(px * 9).toFixed(2)}deg) rotateX(${(-py * 9).toFixed(2)}deg)`;
+    ci.style.setProperty("--gx", ((px + 0.5) * 100).toFixed(1) + "%");
+    ci.style.setProperty("--gy", ((py + 0.5) * 100).toFixed(1) + "%");
+  }, { passive: true });
 
   /* knoppen trekken naar de cursor toe */
   const MAG = ".snap-btn, .ghost-btn, .icon-btn, .cart-btn, .cb-fab";

@@ -13,9 +13,12 @@ OUTRUN is een complete webshop zonder backend en zonder framework. Je kiest je m
 ## Highlights
 
 - **Startanimatie**: het logo husselt zich uit willekeurige tekens, productfoto's stapelen zich erachter op en daarna zoom je door het woord de site in
+- **Interactieve hero**: beweeg je muis over de homepage en er poppen productfoto's op over het logo, naast een ronde sticker die meedraait met je scrollsnelheid
+- **Scroll-verhaal**: een statement dat woord voor woord oplicht, en een lookbook-strook die opzij schuift terwijl de pagina blijft staan
+- **Drop-countdown**: een live aftelklok naar de volgende drop, met aanmelden voor een mail als hij live gaat
 - **Bestellen via de site**: winkelmand in een uitschuiflade, afrekenen met verzenden of ophalen, bevestiging per mail
 - **Voorraad per kleur en maat**: uitverkochte maten zijn doorgestreept, en labels als "Uitverkocht", "Bijna op", "Nieuw", "Binnenkort" en sale-percentages worden automatisch berekend
-- **Eigen cursor**: een blob die uitrekt in de richting waarin je beweegt, om knoppen heen plakt en ze in kleur omkeert, en boven producten een "Bekijk →"-cirkel toont
+- **Eigen cursor**: een snelle blob die uitrekt in de richting waarin je beweegt, om knoppen heen plakt en ze in kleur omkeert, en boven producten een "Bekijk →"-cirkel toont. Productfoto's kantelen in 3D naar je muis.
 - **Bewegend ontwerp**: vloeiend scrollen, koppen die woord voor woord in beeld schuiven, foto-reveals met parallax, een marquee die reageert op je scrollsnelheid en panelen die over het scherm vegen tussen pagina's
 - **Chatbot** die maatadvies geeft op basis van je lengte en precies weet wat er per maat en kleur nog op voorraad is
 - **Licht en donker**, responsive van telefoon tot breed scherm
@@ -85,7 +88,7 @@ Open daarna `http://localhost:8000`.
 
 Alles staat in `assets/data.js`:
 
-- **`CONFIG`**: het e-mailadres waar bestellingen binnenkomen, verzendkosten, gratis verzending vanaf, ophaalplaats, naam van de drop en Snapchat (voor contact)
+- **`CONFIG`**: het e-mailadres waar bestellingen en drop-aanmeldingen binnenkomen, verzendkosten, gratis verzending vanaf, ophaalplaats, naam en datum van de volgende drop (`nextDrop`) en Snapchat (voor contact)
 - **`PRODUCTS`**: per product een naam, categorie en prijs, optioneel `was` (oude prijs), `isNew` of `soon`, en per kleur een foto en de voorraad per maat. Zet een maat op `0` en die is uitverkocht.
 - **`LOOKS`**: de foto's in het lookbook en de producten die erbij horen
 

@@ -9,7 +9,11 @@ const CONFIG = {
   lowStock: 2,                       // vanaf dit aantal of minder: "Bijna op"
   shippingCost: 4.95,                // verzendkosten in euro's
   freeShippingFrom: 100,             // gratis verzending vanaf dit bedrag (0 = nooit gratis)
-  pickupPlace: "Leiden"              // ophalen is gratis; leeg laten ("") = geen ophaaloptie
+  pickupPlace: "Leiden",             // ophalen is gratis; leeg laten ("") = geen ophaaloptie
+  nextDrop: {                        // aftellen op de homepage; aanmeldingen komen binnen op `email`
+    name: "Drop 03",
+    date: "2026-11-14T19:00:00+01:00"
+  }
 };
 
 /* Producten

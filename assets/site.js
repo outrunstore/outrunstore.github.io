@@ -156,8 +156,12 @@ function renderChrome(){
       <div><div class="foot-h">Hulp</div><a href="maten.html">Maattabel</a><a href="info.html#bestellen">Bestellen</a><a href="info.html#verzenden">Verzenden en ophalen</a><a href="info.html#retour">Ruilen en retour</a><a href="aanvragen.html">Iets aanvragen</a></div>
       <div><div class="foot-h">Contact</div><span>Mail: <a href="mailto:${CONFIG.email}">${CONFIG.email}</a></span><span>Snapchat: <a href="${snapUrl}" target="_blank" rel="noopener">${CONFIG.snapUsername}</a></span><span>KvK: ${CONFIG.kvk}</span><a href="over.html">Over OUTRUN</a></div>
     </div>
+    <div class="wrap foot-mark-wrap"><a href="index.html" class="foot-mark" data-fit aria-label="OUTRUN, naar de homepage">${[..."OUTRUN"].map((c, i) => `<span class="${i > 2 ? "acc" : ""}" aria-hidden="true">${c}</span>`).join("")}</a></div>
     <div class="wrap foot-bottom"><span>© ${new Date().getFullYear()} OUTRUN</span><span>Betalen met iDEAL · Foto's: Unsplash</span></div>
   </footer>`;
+
+  /* filmkorrel over de hele site */
+  document.body.insertAdjacentHTML("beforeend", '<div class="grain" aria-hidden="true"></div>');
 
   /* winkelmand-lade */
   document.body.insertAdjacentHTML("beforeend", `
@@ -276,7 +280,8 @@ function toast(msg, ms){
 function fitText(){
   document.querySelectorAll("[data-fit]").forEach(el => {
     el.style.fontSize = "100px";
-    const w = el.scrollWidth, room = el.parentElement.clientWidth;
+    const cs = getComputedStyle(el.parentElement);
+    const w = el.scrollWidth, room = el.parentElement.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
     if (w) el.style.fontSize = Math.min(100 * room / w * 0.93, 400).toFixed(1) + "px"; /* marge voor de schuine stand */
   });
 }
