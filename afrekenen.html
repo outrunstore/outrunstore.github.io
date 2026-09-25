@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Afrekenen · OUTRUN Store</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23101114'/%3E%3Ctext x='33' y='47' font-family='Arial Black,Arial' font-weight='900' font-style='italic' font-size='42' text-anchor='middle' fill='%232436F5'%3EO%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Archivo:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="assets/style.css">
+<script src="assets/data.js"></script>
+</head>
+<body data-page="afrekenen">
+<div id="site-header"></div>
+
+<main>
+  <div class="wrap" id="coWrap">
+    <section class="page-head" style="border-bottom:0;padding-bottom:0">
+      <div class="crumbs"><a href="index.html">Home</a><span>/</span><a href="shop.html">Shop</a><span>/</span><span>Afrekenen</span></div>
+      <h1>Afrekenen</h1>
+    </section>
+
+    <div class="co" id="co">
+      <form id="coForm" novalidate>
+        <div class="co-card">
+          <h2>Je gegevens</h2>
+          <div class="req">
+            <label class="req-field"><span>Naam</span><input name="naam" id="fName" required autocomplete="name" placeholder="Voor- en achternaam"></label>
+            <div class="req-row">
+              <label class="req-field"><span>E-mail</span><input name="email" id="fMail" type="email" required autocomplete="email" placeholder="Voor je bevestiging en betaalverzoek"></label>
+              <label class="req-field"><span>Telefoon (optioneel)</span><input name="telefoon" type="tel" autocomplete="tel" placeholder="06 12345678"></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="co-card">
+          <h2>Bezorging</h2>
+          <div class="choice" id="methods"></div>
+          <div class="req" id="address" style="margin-top:16px">
+            <label class="req-field"><span>Straat en huisnummer</span><input name="adres" required autocomplete="street-address" placeholder="Bijv. Breestraat 12"></label>
+            <div class="req-row">
+              <label class="req-field"><span>Postcode</span><input name="postcode" required autocomplete="postal-code" placeholder="1234 AB" pattern="^\s*[1-9][0-9]{3}\s?[A-Za-z]{2}\s*$"></label>
+              <label class="req-field"><span>Plaats</span><input name="plaats" required autocomplete="address-level2" placeholder="Bijv. Leiden"></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="co-card">
+          <h2>Betalen</h2>
+          <div class="choice">
+            <label><input type="radio" name="betaling" value="iDEAL" checked><span><b>iDEAL</b><small>Na je bestelling krijg je binnen 24 uur een betaalverzoek per mail. Na betaling versturen we je bestelling.</small></span></label>
+          </div>
+          <label class="req-field" style="margin-top:16px"><span>Opmerking (optioneel)</span><textarea name="opmerking" rows="2" placeholder="Iets wat we moeten weten?"></textarea></label>
+          <input type="text" name="_honey" class="req-honey" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <div class="form-error" id="coError" hidden style="margin-top:16px"></div>
+          <button class="snap-btn checkout-btn" id="coSubmit" type="submit" style="width:100%;margin-top:18px"></button>
+          <p class="hint" style="margin-top:10px">Je betaalt nog niet. Je bestelling ligt 24 uur voor je klaar en we versturen pas na betaling.</p>
+        </div>
+      </form>
+
+      <aside class="co-card co-sum" aria-label="Overzicht">
+        <h2>Overzicht</h2>
+        <div id="sumLines"></div>
+        <div id="sumTotals"></div>
+      </aside>
+    </div>
+  </div>
+
+  <div class="wrap empty" id="coEmpty" hidden>
+    <h3>Je winkelmand is leeg</h3>
+    <p>Voeg eerst iets toe voordat je afrekent.</p>
+    <p style="margin-top:16px"><a class="snap-btn" href="shop.html">Naar de shop</a></p>
+  </div>
+
+  <div class="wrap done" id="coDone" hidden>
+    <div class="done-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+    <h1>Bedankt!</h1>
+    <p>Je bestelling is binnen. Je bestelnummer is</p>
+    <div class="order-no" id="doneNo"></div>
+    <div class="next-steps co-card">
+      <div class="step" style="padding:10px 0;border:0"><b>1</b><div><h3>Bevestiging</h3><p>Je krijgt een mail op <strong id="doneMail"></strong> met je bestelling.</p></div></div>
+      <div class="step" style="padding:10px 0;border:0"><b>2</b><div><h3>Betaalverzoek</h3><p>Binnen 24 uur sturen we je een iDEAL-betaalverzoek van <strong id="doneTotal"></strong>.</p></div></div>
+      <div class="step" style="padding:10px 0;border:0"><b>3</b><div><h3 id="doneShipH">Verzending</h3><p id="doneShip"></p></div></div>
+    </div>
+    <a class="snap-btn" href="shop.html">Verder winkelen</a>
+  </div>
+</main>
+
+<div id="site-footer"></div>
+
+<script src="assets/site.js"></script>
+<script>
+const methods = [{v:"verzenden", t:"Verzenden met PostNL", s:"In huis binnen 1-2 werkdagen na betaling"}];
+if (CONFIG.pickupPlace) methods.push({v:"ophalen", t:`Ophalen in ${CONFIG.pickupPlace}`, s:"We mailen je een tijd en plek"});
+let method = "verzenden";
+
+function renderSummary(){
+  const lines = Cart.lines();
+  if (!lines.length){ $("coWrap").hidden = true; $("coEmpty").hidden = false; return; }
+  const sub = Cart.subtotal(), ship = shippingFor(sub, method), total = sub + ship;
+  $("sumLines").innerHTML = lines.map(l => `
+    <div class="line">
+      <div class="line-img"><img src="${l.color.img}" alt=""></div>
+      <div class="line-info">
+        <div class="line-top"><span>${esc(l.p.name)}</span><span class="price">${euro(l.p.price * l.q)}</span></div>
+        <div class="meta">${esc(l.color.n)}${l.size !== "One size" ? " · maat " + l.size : ""} · ${l.q}x</div>
+      </div>
+    </div>`).join("");
+  $("sumTotals").innerHTML = `
+    <div class="sum-row"><span>Subtotaal</span><span class="price">${euro(sub)}</span></div>
+    <div class="sum-row"><span>${method === "ophalen" ? "Ophalen" : "Verzending"}</span><span class="price">${ship ? euro(ship) : "Gratis"}</span></div>
+    <div class="sum-row total"><span>Totaal</span><span class="price">${euro(total)}</span></div>`;
+  $("methods").innerHTML = methods.map(m => {
+    const cost = shippingFor(sub, m.v);
+    return `<label><input type="radio" name="bezorging" value="${m.v}"${m.v === method ? " checked" : ""}><span><b>${m.t}</b><small>${m.s}</small></span><span class="price">${cost ? euro(cost) : "Gratis"}</span></label>`;
+  }).join("");
+  $("address").hidden = method === "ophalen";
+  $("address").querySelectorAll("input").forEach(i => i.required = method !== "ophalen");
+  $("coSubmit").textContent = `Bestelling plaatsen · ${euro(total)}`;
+}
+$("methods").addEventListener("change", e => { method = e.target.value; renderSummary(); });
+addEventListener("storage", renderSummary);
+renderSummary();
+
+$("coForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const form = e.target, err = $("coError");
+  err.hidden = true;
+  if (form._honey.value) return;
+  if (!form.checkValidity()){
+    const bad = form.querySelector(":invalid");
+    err.textContent = bad.name === "postcode" ? "Vul een geldige postcode in, bijvoorbeeld 1234 AB." : "Vul de verplichte velden in.";
+    err.hidden = false; bad.focus(); return;
+  }
+  const lines = Cart.lines();
+  if (!lines.length){ renderSummary(); return; }
+
+  const sub = Cart.subtotal(), ship = shippingFor(sub, method), total = sub + ship;
+  const no = "OR-" + Date.now().toString(36).toUpperCase().slice(-6);
+  const d = Object.fromEntries(new FormData(form));
+  const items = lines.map(l => `${l.q}x ${l.p.name} · ${l.color.n}${l.size !== "One size" ? " · maat " + l.size : ""} · ${euro(l.p.price * l.q)}`).join("\n");
+  const payload = {
+    _subject: `Nieuwe bestelling ${no} · ${euro(total)}`,
+    _template: "table",
+    _captcha: "false",
+    _autoresponse: `Yo ${d.naam.split(" ")[0]}, bedankt voor je bestelling ${no} bij OUTRUN!\n\n${items}\n\nTotaal: ${euro(total)}\n\nBinnen 24 uur krijg je een iDEAL-betaalverzoek. Na betaling ${method === "ophalen" ? "mailen we je waar en wanneer je je bestelling kunt ophalen" : "versturen we je bestelling binnen 1-2 werkdagen met PostNL"}.`,
+    Bestelnummer: no,
+    Naam: d.naam, email: d.email, Telefoon: d.telefoon || "-",
+    Bezorging: method === "ophalen" ? `Ophalen in ${CONFIG.pickupPlace}` : "Verzenden (PostNL)",
+    Adres: method === "ophalen" ? "-" : `${d.adres}, ${d.postcode.toUpperCase()} ${d.plaats}`,
+    Items: items,
+    Subtotaal: euro(sub), Verzending: ship ? euro(ship) : "Gratis", Totaal: euro(total),
+    Betaling: "iDEAL-betaalverzoek", Opmerking: d.opmerking || "-"
+  };
+
+  const btn = $("coSubmit"); btn.disabled = true; btn.textContent = "Bestelling versturen…";
+  try {
+    const res = await fetch("https://formsubmit.co/ajax/" + CONFIG.email, {
+      method: "POST", headers: {"Content-Type": "application/json", "Accept": "application/json"}, body: JSON.stringify(payload)
+    });
+    const out = await res.json().catch(() => ({}));
+    if (!res.ok || String(out.success) !== "true") throw new Error(out.message || "Versturen mislukt");
+
+    Cart.clear();
+    $("doneNo").textContent = no;
+    $("doneMail").textContent = d.email;
+    $("doneTotal").textContent = euro(total);
+    $("doneShipH").textContent = method === "ophalen" ? "Ophalen" : "Verzending";
+    $("doneShip").textContent = method === "ophalen" ? `We mailen je waar en wanneer je je bestelling in ${CONFIG.pickupPlace} kunt ophalen.` : "Na betaling versturen we je bestelling binnen 1-2 werkdagen met PostNL en track & trace.";
+    $("coWrap").hidden = true; $("coDone").hidden = false;
+    scrollTo({top: 0, behavior: "instant"});
+  } catch(ex){
+    /* vangnet: bestelling via je eigen mailprogramma versturen */
+    const body = Object.entries(payload).filter(([k]) => !k.startsWith("_")).map(([k, v]) => `${k}: ${v}`).join("\n");
+    err.innerHTML = `Je bestelling kon niet verstuurd worden. Probeer het opnieuw, of <a href="mailto:${CONFIG.email}?subject=${encodeURIComponent("Bestelling " + no)}&body=${encodeURIComponent(body)}">verstuur 'm per mail</a>.`;
+    err.hidden = false;
+    btn.disabled = false; renderSummary();
+  }
+});
+</script>
+<script src="assets/motion.js"></script>
+<script src="assets/chatbot.js"></script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 /* ====== OUTRUN — gedeelde code voor alle pagina's ====== */
 const snapUrl = "https://www.snapchat.com/add/" + encodeURIComponent(CONFIG.snapUsername);
-const euro = n => "€" + n.toFixed(0);
+const euro = n => "€" + (n % 1 ? n.toFixed(2).replace(".", ",") : n.toFixed(0));
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const $ = id => document.getElementById(id);
 
@@ -37,11 +37,11 @@ function priceHtml(p){
 function card(p){
   const img2 = (p.colors[1] && p.colors[1].img) || (p.extra && p.extra[0]);
   const sizes = sizesOf(p);
-  const sizeLine = p.soon ? '<span class="meta">Reserveer via Snap</span>'
+  const sizeLine = p.soon ? '<span class="meta">Binnenkort</span>'
     : sizes.length === 1 ? `<span class="meta">${isSoldOut(p) ? "Uitverkocht" : sizes[0]}</span>`
     : `<span class="size-line">${sizes.map(s => sizesInStock(p).includes(s) ? `<span>${s}</span>` : `<s title="Uitverkocht">${s}</s>`).join("")}</span>`;
   return `
-  <a class="card${isSoldOut(p) ? " is-out" : ""}" href="${productUrl(p)}">
+  <a class="card${isSoldOut(p) ? " is-out" : ""}" href="${productUrl(p)}" data-cursor="Bekijk">
     <div class="card-img">
       ${badges(p)}
       <img src="${p.colors[0].img}" alt="${esc(p.name)} in ${esc(p.colors[0].n.toLowerCase())}" loading="lazy">
@@ -57,8 +57,57 @@ function card(p){
   </a>`;
 }
 
-/* ---------- header, footer, menu ---------- */
-const SNAP_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5c3 0 5.2 2.3 5.2 5.3v2.3c.5.2 1.1.1 1.6-.1.6-.2 1.1.5.6 1-.5.4-1.4.8-2.1 1 .6 1.9 2 3.3 4 3.9.5.2.4.8-.1 1-.8.3-1.7.4-2.1.6-.2.5-.2 1.1-.6 1.2-.7.1-1.6-.3-2.6.1-.9.4-1.8 1.7-3.9 1.7s-3-1.3-3.9-1.7c-1-.4-1.9 0-2.6-.1-.4-.1-.4-.7-.6-1.2-.4-.2-1.3-.3-2.1-.6-.5-.2-.6-.8-.1-1 2-.6 3.4-2 4-3.9-.7-.2-1.6-.6-2.1-1-.5-.5 0-1.2.6-1 .5.2 1.1.3 1.6.1V7.8c0-3 2.2-5.3 5.2-5.3z"/></svg>';
+/* ---------- winkelmand ---------- */
+/* opgeslagen als [{id, c: kleurnaam, s: maat, q: aantal}] */
+const Cart = {
+  key: "outrun-cart",
+  mem: [],
+  raw(){
+    try { const a = JSON.parse(localStorage.getItem(this.key) || "[]"); return Array.isArray(a) ? a : []; }
+    catch(e){ return this.mem; }
+  },
+  save(a){
+    this.mem = a;
+    try { localStorage.setItem(this.key, JSON.stringify(a)); } catch(e){}
+    renderCart();
+  },
+  /* regels met product erbij; ongeldige of uitverkochte regels vallen weg, aantal max. voorraad */
+  lines(){
+    return this.raw().map(it => {
+      const p = productById(it.id); if (!p) return null;
+      const ci = p.colors.findIndex(c => c.n === it.c); if (ci < 0) return null;
+      const max = p.colors[ci].stock[it.s] || 0; if (!max || p.soon) return null;
+      return { p, ci, color: p.colors[ci], size: it.s, q: Math.min(Math.max(1, it.q | 0), max), max };
+    }).filter(Boolean);
+  },
+  count(){ return this.lines().reduce((a, l) => a + l.q, 0); },
+  subtotal(){ return this.lines().reduce((a, l) => a + l.q * l.p.price, 0); },
+  add(id, colorName, size, q = 1){
+    const a = this.raw();
+    const hit = a.find(x => x.id === id && x.c === colorName && x.s === size);
+    const p = productById(id), max = p.colors.find(c => c.n === colorName).stock[size] || 0;
+    const now = hit ? hit.q : 0;
+    if (now >= max){ toast(`Je hebt alle ${max} op voorraad al in je mand`); return false; }
+    if (hit) hit.q = Math.min(max, now + q); else a.push({ id, c: colorName, s: size, q: Math.min(max, q) });
+    this.save(a); return true;
+  },
+  set(i, q){
+    const lines = this.lines();
+    const next = lines.map(l => ({ id: l.p.id, c: l.color.n, s: l.size, q: l.q }));
+    if (q <= 0) next.splice(i, 1); else next[i].q = Math.min(q, lines[i].max);
+    this.save(next);
+  },
+  clear(){ this.save([]); }
+};
+
+function shippingFor(subtotal, method){
+  if (method === "ophalen") return 0;
+  if (CONFIG.freeShippingFrom && subtotal >= CONFIG.freeShippingFrom) return 0;
+  return CONFIG.shippingCost;
+}
+
+/* ---------- header, footer, menu, winkelmand-lade ---------- */
+const BAG_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>';
 const NAV = [
   ["shop.html", "Shop", "shop"], ["shop.html?filter=nieuw", "Nieuw", "nieuw"], ["lookbook.html", "Lookbook", "lookbook"],
   ["maten.html", "Maten", "maten"], ["aanvragen.html", "Aanvragen", "aanvragen"], ["info.html", "Info", "info"], ["over.html", "Over ons", "over"]
@@ -69,12 +118,13 @@ function renderChrome(){
   const onNew = page === "shop" && new URLSearchParams(location.search).get("filter") === "nieuw";
   const links = NAV.map(([href, label, key]) => {
     const active = key === "nieuw" ? onNew : key === page && !(key === "shop" && onNew);
-    return `<a href="${href}"${active ? ' aria-current="page"' : ""}>${label}</a>`;
+    return `<a href="${href}"${active ? ' aria-current="page"' : ""}><span>${label}</span></a>`;
   }).join("");
+  const free = CONFIG.freeShippingFrom ? `Gratis verzending vanaf ${euro(CONFIG.freeShippingFrom)}` : "Verzending door heel Nederland";
 
   $("site-header").outerHTML = `
-  <div class="announce">${CONFIG.dropName} ${CONFIG.dropLive ? "is live" : "komt eraan"}  ·  Bestellen via Snapchat<span class="long">  ·  Verzending door heel Nederland in 1-2 werkdagen</span></div>
-  <header class="top">
+  <div class="announce"><span class="drop-part">${CONFIG.dropName} ${CONFIG.dropLive ? "is live" : "komt eraan"}  ·  </span>${free}<span class="long">  ·  Betalen met iDEAL  ·  In huis binnen 1-2 werkdagen</span></div>
+  <header class="top" id="top">
     <div class="wrap">
       <button class="icon-btn menu-btn" id="menuBtn" aria-label="Menu" aria-expanded="false" aria-controls="mainNav">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
@@ -85,7 +135,9 @@ function renderChrome(){
         <button class="icon-btn" id="themeBtn" aria-label="Wissel licht/donker">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
         </button>
-        <a class="snap-btn top-cta snaplink" href="${snapUrl}" target="_blank" rel="noopener">${SNAP_ICON}<span>Volg op Snap</span></a>
+        <button class="cart-btn" id="cartBtn" type="button" aria-label="Winkelmand" aria-controls="cartDrawer">
+          ${BAG_ICON}<span class="cart-label">Winkelmand</span><span class="cart-count" id="cartCount">0</span>
+        </button>
       </div>
     </div>
   </header>`;
@@ -99,10 +151,24 @@ function renderChrome(){
       </div>
       <div><div class="foot-h">Shop</div>${CATS.map(c => `<a href="shop.html?cat=${encodeURIComponent(c)}">${c}</a>`).join("")}</div>
       <div><div class="foot-h">Hulp</div><a href="maten.html">Maattabel</a><a href="info.html#bestellen">Bestellen</a><a href="info.html#verzenden">Verzenden en ophalen</a><a href="info.html#retour">Ruilen en retour</a><a href="aanvragen.html">Iets aanvragen</a></div>
-      <div><div class="foot-h">Contact</div><span>Snap: <strong>${CONFIG.snapUsername}</strong></span><span>Mail: <a href="mailto:${CONFIG.email}">${CONFIG.email}</a></span><span>KvK: ${CONFIG.kvk}</span><a href="over.html">Over OUTRUN</a></div>
+      <div><div class="foot-h">Contact</div><span>Mail: <a href="mailto:${CONFIG.email}">${CONFIG.email}</a></span><span>Snapchat: <a href="${snapUrl}" target="_blank" rel="noopener">${CONFIG.snapUsername}</a></span><span>KvK: ${CONFIG.kvk}</span><a href="over.html">Over OUTRUN</a></div>
     </div>
-    <div class="wrap foot-bottom"><span>© ${new Date().getFullYear()} OUTRUN</span><span>Foto's: Unsplash</span></div>
+    <div class="wrap foot-bottom"><span>© ${new Date().getFullYear()} OUTRUN</span><span>Betalen met iDEAL · Foto's: Unsplash</span></div>
   </footer>`;
+
+  /* winkelmand-lade */
+  document.body.insertAdjacentHTML("beforeend", `
+  <div class="drawer-veil" id="cartVeil"></div>
+  <aside class="drawer" id="cartDrawer" role="dialog" aria-modal="true" aria-labelledby="cartTitle" aria-hidden="true">
+    <div class="drawer-head">
+      <h2 id="cartTitle">Winkelmand</h2>
+      <button class="icon-btn" id="cartClose" type="button" aria-label="Winkelmand sluiten">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+    <div class="drawer-body" id="cartBody"></div>
+    <div class="drawer-foot" id="cartFoot"></div>
+  </aside>`);
 
   const menuBtn = $("menuBtn"), nav = $("mainNav");
   menuBtn.addEventListener("click", () => {
@@ -116,9 +182,80 @@ function renderChrome(){
     try { localStorage.setItem("outrun-theme", root.dataset.theme); } catch(e){}
   });
 
+  $("cartBtn").addEventListener("click", openCart);
+  $("cartClose").addEventListener("click", closeCart);
+  $("cartVeil").addEventListener("click", closeCart);
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && document.documentElement.classList.contains("cart-open")) closeCart(); });
+  $("cartBody").addEventListener("click", e => {
+    const b = e.target.closest("[data-line]"); if (!b) return;
+    const i = +b.dataset.line, l = Cart.lines()[i];
+    if (b.dataset.act === "min") Cart.set(i, l.q - 1);
+    if (b.dataset.act === "plus"){ if (l.q >= l.max) toast(`Nog maar ${l.max} op voorraad`); else Cart.set(i, l.q + 1); }
+    if (b.dataset.act === "del") Cart.set(i, 0);
+  });
+  addEventListener("storage", e => { if (e.key === Cart.key) renderCart(); });
+
   document.querySelectorAll(".snapname").forEach(el => el.textContent = CONFIG.snapUsername);
   document.querySelectorAll(".mailaddr").forEach(el => el.textContent = CONFIG.email);
   document.querySelectorAll(".snaplink").forEach(a => a.href = snapUrl);
+  renderCart();
+}
+
+let cartLastFocus = null;
+function openCart(){
+  cartLastFocus = document.activeElement;
+  document.documentElement.classList.add("cart-open");
+  $("cartDrawer").setAttribute("aria-hidden", "false");
+  setTimeout(() => $("cartClose").focus(), 50);
+}
+function closeCart(){
+  document.documentElement.classList.remove("cart-open");
+  $("cartDrawer").setAttribute("aria-hidden", "true");
+  if (cartLastFocus) cartLastFocus.focus();
+}
+
+function renderCart(){
+  if (!$("cartBody")) return;
+  const lines = Cart.lines(), n = lines.reduce((a, l) => a + l.q, 0), sub = Cart.subtotal();
+  const countEl = $("cartCount");
+  if (countEl.textContent !== String(n)){
+    countEl.textContent = n;
+    countEl.classList.remove("bump"); void countEl.offsetWidth; countEl.classList.add("bump");
+  }
+  countEl.hidden = n === 0;
+  $("cartTitle").textContent = n ? `Winkelmand (${n})` : "Winkelmand";
+
+  if (!lines.length){
+    $("cartBody").innerHTML = `<div class="drawer-empty">${BAG_ICON}<h3>Je winkelmand is leeg</h3><p>Nog niks gevonden? Check wat er nieuw binnen is.</p><a class="snap-btn" href="shop.html">Naar de shop</a></div>`;
+    $("cartFoot").innerHTML = "";
+    return;
+  }
+  $("cartBody").innerHTML = lines.map((l, i) => `
+    <div class="line">
+      <a href="${productUrl(l.p)}&kleur=${encodeURIComponent(l.color.n)}" class="line-img"><img src="${l.color.img}" alt=""></a>
+      <div class="line-info">
+        <div class="line-top"><a href="${productUrl(l.p)}&kleur=${encodeURIComponent(l.color.n)}">${esc(l.p.name)}</a><span class="price">${euro(l.p.price * l.q)}</span></div>
+        <div class="meta">${esc(l.color.n)}${l.size !== "One size" ? " · maat " + l.size : ""}${l.max <= CONFIG.lowStock ? ` · <span class="warn">nog ${l.max}</span>` : ""}</div>
+        <div class="line-bottom">
+          <div class="qty" role="group" aria-label="Aantal">
+            <button type="button" data-line="${i}" data-act="min" aria-label="Eén minder">−</button>
+            <span>${l.q}</span>
+            <button type="button" data-line="${i}" data-act="plus" aria-label="Eén meer"${l.q >= l.max ? ' class="is-max"' : ""}>+</button>
+          </div>
+          <button type="button" class="line-del" data-line="${i}" data-act="del">Verwijder</button>
+        </div>
+      </div>
+    </div>`).join("");
+
+  const togo = CONFIG.freeShippingFrom ? CONFIG.freeShippingFrom - sub : 0;
+  const pct = CONFIG.freeShippingFrom ? Math.min(100, sub / CONFIG.freeShippingFrom * 100) : 100;
+  $("cartFoot").innerHTML = `
+    ${CONFIG.freeShippingFrom ? `<div class="ship-meter"><p>${togo > 0 ? `Nog <b>${euro(togo)}</b> tot gratis verzending` : "Je hebt <b>gratis verzending</b>"}</p><div class="meter"><i style="width:${pct}%"></i></div></div>` : ""}
+    <div class="sum-row"><span>Subtotaal</span><span class="price">${euro(sub)}</span></div>
+    <p class="hint">Verzendkosten zie je bij het afrekenen. Ophalen${CONFIG.pickupPlace ? " in " + CONFIG.pickupPlace : ""} is gratis.</p>
+    <a class="snap-btn checkout-btn" href="afrekenen.html">Afrekenen</a>
+    <button type="button" class="link-btn" id="cartMore">Verder winkelen</button>`;
+  $("cartMore").addEventListener("click", closeCart);
 }
 
 /* ---------- toast ---------- */

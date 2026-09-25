@@ -3,11 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="OUTRUN streetwear: puffers, hoodies, trainingspakken, sneakers, petten en mutsen. Bestellen via Snapchat, verzending door heel Nederland.">
+<meta name="description" content="OUTRUN streetwear: puffers, hoodies, trainingspakken, sneakers, petten en mutsen. Bestel online, betaal met iDEAL, verzending door heel Nederland.">
 <meta property="og:title" content="OUTRUN Store">
-<meta property="og:description" content="Look duur, betaal eerlijk. Bestel via Snapchat: outrun.store">
+<meta property="og:description" content="Look duur, betaal eerlijk. Streetwear in kleine drops.">
 <meta property="og:image" content="img/look-hero.jpg">
 <title>OUTRUN Store</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23101114'/%3E%3Ctext x='33' y='47' font-family='Arial Black,Arial' font-weight='900' font-style='italic' font-size='42' text-anchor='middle' fill='%232436F5'%3EO%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Archivo:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
@@ -22,19 +23,19 @@
     <div class="wrap hero-grid">
       <div class="hero-copy">
         <div>
-          <div class="eyebrow">Streetwear · verzending door heel Nederland</div>
-          <h1 class="wordmark">Outrun</h1>
+          <div class="eyebrow" data-enter style="--i:0">Streetwear · verzending door heel Nederland</div>
+          <h1 class="wordmark" data-enter style="--i:0">Outrun</h1>
         </div>
-        <div class="drop-status"><span class="dot"></span><span id="dropStatus"></span></div>
-        <p><strong>Look duur, betaal eerlijk.</strong> Puffers, hoodies, trainingspakken, sneakers en meer in kleine drops. Op is op, dus wees er snel bij.</p>
-        <div class="hero-actions">
+        <div class="drop-status" data-enter style="--i:1"><span class="dot"></span><span id="dropStatus"></span></div>
+        <p data-enter style="--i:2"><strong>Look duur, betaal eerlijk.</strong> Puffers, hoodies, trainingspakken, sneakers en meer in kleine drops. Op is op, dus wees er snel bij.</p>
+        <div class="hero-actions" data-enter style="--i:3">
           <a href="shop.html" class="snap-btn">Shop de collectie</a>
           <a href="shop.html?filter=nieuw" class="ghost-btn">Nieuw binnen</a>
           <button type="button" class="ghost-btn" data-open-chat>Vraag de chatbot</button>
         </div>
-        <div class="stats" id="stats"></div>
+        <div class="stats" id="stats" data-enter style="--i:4"></div>
       </div>
-      <a class="hero-img" href="lookbook.html">
+      <a class="hero-img" href="lookbook.html" data-cursor="Lookbook">
         <img src="img/look-hero.jpg" alt="Twee jongens in zwarte OUTRUN-streetwear tegen een blauwe lucht" fetchpriority="high">
         <div class="caption"><div><div class="eyebrow" style="color:#fff;opacity:.85">Lookbook</div><b style="font-family:var(--display);font-size:30px;text-transform:uppercase;font-style:italic">Night shift</b></div><span class="snap-btn">Bekijk de looks</span></div>
       </a>
@@ -65,21 +66,21 @@
 
   <div class="wrap">
     <div class="steps" aria-label="Zo bestel je">
-      <div class="step"><b>1</b><div><h3>Kies je item</h3><p>Kies je kleur en maat. Uitverkochte maten zijn doorgestreept.</p></div></div>
-      <div class="step"><b>2</b><div><h3>Snap ons</h3><p>Kopieer je bestelling en stuur 'm naar <span class="snapname"></span>.</p></div></div>
-      <div class="step"><b>3</b><div><h3>Betaal en ontvang</h3><p>Je krijgt een Tikkie en je bestelling ligt binnen 1-2 werkdagen bij je.</p></div></div>
+      <div class="step"><b>1</b><div><h3>Kies je item</h3><p>Kies je kleur en maat en leg het in je winkelmand.</p></div></div>
+      <div class="step"><b>2</b><div><h3>Reken af</h3><p>Vul je gegevens in en kies verzenden of ophalen.</p></div></div>
+      <div class="step"><b>3</b><div><h3>Betaal en ontvang</h3><p>Betaal met iDEAL en je bestelling ligt binnen 1-2 werkdagen bij je.</p></div></div>
     </div>
   </div>
 
   <section class="section">
     <div class="wrap">
-      <a class="banner" href="product.html?id=fleece" style="text-decoration:none">
+      <a class="banner" href="product.html?id=fleece" style="text-decoration:none" data-cursor="Bekijk">
         <img src="img/fleece-creme.jpg" alt="" loading="lazy" style="object-position:center 30%">
         <div class="banner-body">
           <div class="eyebrow">Binnenkort</div>
           <h2>Trail Fleece</h2>
-          <p>Teddy fleece met colour-block panelen. Nog niet binnen, maar je kunt er nu al een reserveren.</p>
-          <span class="snap-btn">Reserveer de jouwe</span>
+          <p>Teddy fleece met colour-block panelen. Nog niet binnen. Laat het ons weten en je hoort het als eerste.</p>
+          <span class="snap-btn">Bekijk de Trail Fleece</span>
         </div>
       </a>
     </div>
@@ -98,8 +99,8 @@
   <section class="section" style="padding-top:0">
     <div class="wrap usps">
       <div class="usp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.5"/><circle cx="17" cy="17.5" r="1.5"/></svg><h3>1-2 werkdagen</h3><p>Verzending door heel Nederland met PostNL en track &amp; trace.</p></div>
-      <div class="usp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/></svg><h3>Betalen met Tikkie</h3><p>Veilig via iDEAL, pas nadat we je bestelling hebben bevestigd.</p></div>
-      <div class="usp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><h3>Ophalen in Leiden</h3><p>Woon je in de buurt? Haal je bestelling op, regel het via Snap.</p></div>
+      <div class="usp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/></svg><h3>Betalen met iDEAL</h3><p>Na je bestelling krijg je een betaalverzoek. Pas na betaling versturen we.</p></div>
+      <div class="usp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg><h3>Gratis ophalen in Leiden</h3><p>Woon je in de buurt? Kies bij het afrekenen voor ophalen.</p></div>
       <div class="usp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="7" width="16" height="12" rx="3"/><path d="M12 7V4M9 12h.01M15 12h.01M9 16h6"/></svg><h3>Chatbot 24/7</h3><p>Maatadvies, voorraad en prijzen. Onze bot weet het meteen.</p></div>
     </div>
   </section>
@@ -111,20 +112,21 @@
 <script>
 const CAT_IMG = {Jassen:"img/nightrun-zwart.jpg", Hoodies:"img/core-taupe.jpg", "T-shirts":"img/blank-zwart.jpg", Trainingspakken:"img/track02-geel.jpg", Broeken:"img/jogger-grijs.jpg", Schoenen:"img/stride-wit.jpg", Petten:"img/pace-grijs.jpg", Mutsen:"img/beanie-oker.jpg", Accessoires:"img/sling-look.jpg"};
 
-$("dropStatus").textContent = CONFIG.dropLive ? `${CONFIG.dropName} is live` : `${CONFIG.dropName} · binnenkort · snap ons om te reserveren`;
+$("dropStatus").textContent = CONFIG.dropLive ? `${CONFIG.dropName} is live` : `${CONFIG.dropName} · binnenkort`;
 $("stats").innerHTML = `<div><b>${PRODUCTS.length}</b><span>items in de drop</span></div><div><b>${PRODUCTS.filter(isSoldOut).length}</b><span>al uitverkocht</span></div><div><b>1-2</b><span>werkdagen levering</span></div>`;
 
-const words = ["Look duur", "Betaal eerlijk", "Op is op", CONFIG.dropName, "Bestel via Snap", "Verzending door heel NL"];
+const words = ["Look duur", "Betaal eerlijk", "Op is op", CONFIG.dropName, "Betaal met iDEAL", "Verzending door heel NL"];
 $("marquee").innerHTML = [...words, ...words].map(w => `<span>${esc(w)}</span>`).join("");
 
 $("cats").innerHTML = CATS.map(c => {
   const ps = PRODUCTS.filter(p => p.cat === c);
-  return `<a class="cat" href="shop.html?cat=${encodeURIComponent(c)}"><img src="${CAT_IMG[c] || ps[0].colors[0].img}" alt="" loading="lazy"><span>${c}<small>${ps.length} ${ps.length === 1 ? "item" : "items"}</small></span></a>`;
+  return `<a class="cat" data-cursor="Shop" href="shop.html?cat=${encodeURIComponent(c)}"><img src="${CAT_IMG[c] || ps[0].colors[0].img}" alt="" loading="lazy"><span>${c}<small>${ps.length} ${ps.length === 1 ? "item" : "items"}</small></span></a>`;
 }).join("");
 
 $("newGrid").innerHTML = PRODUCTS.filter(p => p.isNew).slice(0, 4).map(card).join("");
 $("lastGrid").innerHTML = PRODUCTS.filter(p => !p.soon && !isSoldOut(p)).sort((a, b) => productTotal(a) - productTotal(b)).slice(0, 4).map(card).join("");
 </script>
+<script src="assets/motion.js"></script>
 <script src="assets/chatbot.js"></script>
 </body>
 </html>

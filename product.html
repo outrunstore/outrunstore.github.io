@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Product · OUTRUN Store</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23101114'/%3E%3Ctext x='33' y='47' font-family='Arial Black,Arial' font-weight='900' font-style='italic' font-size='42' text-anchor='middle' fill='%232436F5'%3EO%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Archivo:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
@@ -43,21 +44,20 @@
 
         <p class="stock-msg" id="stockMsg"></p>
 
-        <div class="order-box">
-          <div class="label" style="margin:0"><span>Je bestelling</span></div>
-          <div class="code" id="orderText"></div>
-          <div class="order-btns">
-            <a class="snap-btn snaplink" id="orderSnap" href="#" target="_blank" rel="noopener"></a>
-            <button class="ghost-btn" id="copyBtn" type="button">Kopieer bestelling</button>
+        <div class="buy">
+          <button class="snap-btn add-btn" id="addBtn" type="button"></button>
+          <div class="buy-notes">
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7"/><circle cx="7" cy="17.5" r="1.5"/><circle cx="17" cy="17.5" r="1.5"/></svg><span id="shipNote"></span></span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/></svg>Betalen met iDEAL</span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg>In huis in 1-2 werkdagen</span>
           </div>
-          <p class="hint">Bestellen gaat via Snapchat. Kopieer je bestelling, open Snap en stuur 'm naar <strong class="snapname"></strong>. Je krijgt dan een Tikkie.</p>
         </div>
 
         <div>
           <details open><summary>Productdetails</summary><ul id="pDetails"></ul></details>
           <details><summary>Pasvorm en maat</summary><p id="pFit"></p></details>
-          <details><summary>Verzenden en betalen</summary><p>We versturen door heel Nederland met PostNL en track &amp; trace, binnen 1-2 werkdagen na betaling. Betalen gaat via Tikkie (iDEAL). Woon je in de buurt van Leiden? Dan kun je ook ophalen.</p></details>
-          <details><summary>Uitverkocht in jouw maat?</summary><p>Snap ons met het item, je kleur en maat. Dan laten we het je weten als er een restock komt, of we zoeken iets vergelijkbaars voor je via een <a id="reqLink" href="aanvragen.html">aanvraag</a>.</p></details>
+          <details><summary>Verzenden en betalen</summary><p id="pShip"></p></details>
+          <details><summary>Uitverkocht in jouw maat?</summary><p>Doe een <a id="reqLink" href="aanvragen.html">aanvraag</a> met het item, je kleur en maat. Dan laten we het je weten als er een restock komt, of we zoeken iets vergelijkbaars voor je.</p></details>
         </div>
       </div>
     </div>
@@ -87,6 +87,9 @@ if (!p){
 } else {
   window.currentProduct = p; /* voor de chatbot */
   $("reqLink").href = "aanvragen.html?item=" + encodeURIComponent(p.name + " ");
+  const freeNote = CONFIG.freeShippingFrom ? `gratis vanaf ${euro(CONFIG.freeShippingFrom)}` : "";
+  $("shipNote").textContent = CONFIG.freeShippingFrom ? `Gratis verzending vanaf ${euro(CONFIG.freeShippingFrom)}` : `Verzending ${euro(CONFIG.shippingCost)}`;
+  $("pShip").innerHTML = `We versturen door heel Nederland met PostNL en track &amp; trace, binnen 1-2 werkdagen na betaling. Verzending kost ${euro(CONFIG.shippingCost)}${freeNote ? ", " + freeNote : ""}. Je betaalt met iDEAL: na je bestelling krijg je een betaalverzoek.${CONFIG.pickupPlace ? ` Woon je in de buurt van ${CONFIG.pickupPlace}? Kies dan bij het afrekenen voor gratis ophalen.` : ""}`;
   const sizes = sizesOf(p);
   const oneSize = sizes.length === 1;
   /* start op de eerste kleur die nog op voorraad is */
@@ -141,26 +144,21 @@ if (!p){
     /* voorraadmelding */
     const msg = $("stockMsg");
     const colorOut = colorTotal(c) === 0;
-    if (p.soon){ msg.className = "stock-msg low"; msg.textContent = "Binnenkort binnen. Reserveer nu via Snap."; }
-    else if (isSoldOut(p)){ msg.className = "stock-msg out"; msg.textContent = "Helemaal uitverkocht. Snap ons voor een restock-melding."; }
+    if (p.soon){ msg.className = "stock-msg low"; msg.textContent = "Binnenkort binnen. Laat het ons weten, dan hoor je het als eerste."; }
+    else if (isSoldOut(p)){ msg.className = "stock-msg out"; msg.textContent = "Helemaal uitverkocht. Laat het ons weten als je een restock-melding wilt."; }
     else if (colorOut){ msg.className = "stock-msg out"; msg.textContent = `${c.n} is uitverkocht. Kies een andere kleur.`; }
     else if (size){ const n = c.stock[size]; msg.className = "stock-msg" + (n <= CONFIG.lowStock ? " low" : ""); msg.textContent = n <= CONFIG.lowStock ? `Nog maar ${n} op voorraad in ${size === "One size" ? "deze kleur" : "maat " + size}` : `Op voorraad${oneSize ? "" : " in maat " + size}`; }
     else { const free = sizes.filter(s => c.stock[s] > 0); msg.className = "stock-msg"; msg.textContent = `Op voorraad in ${free.join(", ")}. Kies je maat.`; }
 
-    /* bestelling */
-    const unavailable = !p.soon && (isSoldOut(p) || colorOut);
-    const order = p.soon
-      ? `Yo! Ik wil de ${p.name} in ${c.n.toLowerCase()} reserveren${size && !oneSize ? `, maat ${size}` : ""}.`
-      : unavailable
-      ? `Yo! Laat je het weten als de ${p.name} in ${c.n.toLowerCase()} weer binnen is?`
-      : `Yo! Ik wil de ${p.name} in ${c.n.toLowerCase()}${oneSize ? "" : `, maat ${size || "…"}`} (${euro(p.price)}).`;
-    $("orderText").textContent = order;
-    const needsSize = !p.soon && !unavailable && !size;
-    $("orderSnap").innerHTML = SNAP_ICON + (p.soon ? "Snap om te reserveren" : unavailable ? "Snap voor restock" : needsSize ? "Kies eerst je maat" : "Bestel via Snap");
-    $("orderSnap").toggleAttribute("aria-disabled", needsSize);
-    $("orderSnap").style.opacity = needsSize ? ".45" : "";
-    $("copyBtn").disabled = needsSize;
-    $("copyBtn").style.opacity = needsSize ? ".45" : "";
+    /* knop: in winkelmand */
+    const btn = $("addBtn");
+    const unavailable = p.soon || isSoldOut(p) || colorOut;
+    btn.classList.remove("is-added");
+    btn.classList.toggle("is-notify", unavailable);
+    btn.setAttribute("aria-disabled", String(!unavailable && !size));
+    btn.innerHTML = unavailable
+      ? (p.soon ? "Laat het me weten als 'ie binnen is" : "Uitverkocht · laat het me weten bij restock")
+      : BAG_ICON.replace("<svg", '<svg style="width:18px;height:18px"') + " " + (!size ? "Kies eerst je maat" : `In winkelmand · ${euro(p.price)}`);
   }
 
   $("colorOpts").addEventListener("click", e => {
@@ -177,13 +175,19 @@ if (!p){
     if (images[imgIndex].color !== null){ ci = images[imgIndex].color; render(); }
     renderGallery();
   });
-  $("orderSnap").addEventListener("click", e => {
-    if ($("orderSnap").hasAttribute("aria-disabled")){ e.preventDefault(); toast("Kies eerst je maat"); return; }
-    navigator.clipboard && navigator.clipboard.writeText($("orderText").textContent).catch(() => {});
-  });
-  $("copyBtn").addEventListener("click", async () => {
-    try { await navigator.clipboard.writeText($("orderText").textContent); toast("Gekopieerd! Plak 'm in Snap"); }
-    catch(e){ toast("Kopiëren lukte niet, selecteer de tekst zelf"); }
+  $("addBtn").addEventListener("click", () => {
+    const btn = $("addBtn");
+    if (btn.classList.contains("is-notify")){ location.href = $("reqLink").href; return; }
+    if (btn.getAttribute("aria-disabled") === "true"){
+      toast("Kies eerst je maat");
+      $("sizeOpts").animate([{translate:"0"},{translate:"-6px"},{translate:"6px"},{translate:"0"}], {duration:300});
+      return;
+    }
+    if (Cart.add(p.id, p.colors[ci].n, size)){
+      btn.classList.add("is-added");
+      btn.innerHTML = "✓ Toegevoegd";
+      setTimeout(() => { render(); openCart(); }, 650);
+    }
   });
 
   renderGallery(); render();
@@ -194,6 +198,7 @@ if (!p){
   $("related").innerHTML = others.slice(0, 4).map(card).join("");
 }
 </script>
+<script src="assets/motion.js"></script>
 <script src="assets/chatbot.js"></script>
 </body>
 </html>

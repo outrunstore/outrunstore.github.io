@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Maattabellen van OUTRUN voor tops, jassen, broeken en sneakers, plus een maatcalculator op basis van je lengte.">
 <title>Maten · OUTRUN Store</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23101114'/%3E%3Ctext x='33' y='47' font-family='Arial Black,Arial' font-weight='900' font-style='italic' font-size='42' text-anchor='middle' fill='%232436F5'%3EO%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Archivo:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
@@ -46,7 +47,7 @@
         <details><summary>Lengte</summary><p>Meet van het hoogste punt van de schouder, naast de kraag, recht naar beneden tot de onderkant.</p></details>
         <details><summary>Taille en binnenbeen</summary><p>Meet de taille van een broek die goed zit, plat gemeten, en doe dat keer twee. Het binnenbeen meet je van het kruis tot de onderkant van de pijp.</p></details>
         <details><summary>Voetlengte</summary><p>Zet je hiel tegen de muur, zet een streep bij je langste teen en meet in centimeters. Kijk daarna in de sneakertabel.</p></details>
-        <p class="note">Twijfel je nog? Stuur ons je lengte op Snap (<strong class="snapname"></strong>) of vraag het aan de chatbot.</p>
+        <p class="note">Twijfel je nog? Vraag het aan de chatbot of mail ons je lengte.</p>
       </div>
     </div>
   </section>
@@ -119,13 +120,14 @@ function calc(){
   let i = cm < 172 ? 0 : cm < 178 ? 1 : cm < 184 ? 2 : 3;
   i = Math.min(3, Math.max(0, i + shift));
   const s = SIZES[i];
-  const extra = cm > 190 ? " Ben je langer dan 1,90 m? Snap ons even, dan checken we de lengte." : cm < 165 ? " Alles valt ruim, dus S is prima." : "";
+  const extra = cm > 190 ? " Ben je langer dan 1,90 m? Mail ons even, dan checken we de lengte." : cm < 165 ? " Alles valt ruim, dus S is prima." : "";
   const free = PRODUCTS.filter(p => sizesOf(p).includes(s) && !p.soon && p.colors.some(c => c.stock[s] > 0)).length;
   out.innerHTML = `Maat ${s}<small>${free} items op voorraad in ${s}. <a href="shop.html?size=${s}&stock=1" style="color:inherit;font-weight:700">Bekijk ze →</a>${extra}</small>`;
 }
 $("cm").addEventListener("input", calc);
 $("fit").addEventListener("change", calc);
 </script>
+<script src="assets/motion.js"></script>
 <script src="assets/chatbot.js"></script>
 </body>
 </html>

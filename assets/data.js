@@ -1,12 +1,15 @@
 /* ====== INSTELLINGEN — pas deze aan ====== */
 const CONFIG = {
-  snapUsername: "outrun.store",      // je Snapchat-gebruikersnaam
+  snapUsername: "outrun.store",      // Snapchat, alleen voor contact
   dropName: "Drop 02 · Winter",
-  dropLive: true,                    // false = reserveren, true = drop is live
+  dropLive: true,                    // false = drop komt eraan, true = drop is live
   kvk: "volgt",                      // je KvK-nummer
-  email: "outrun.store22@gmail.com", // aanvragen + contact
+  email: "outrun.store22@gmail.com", // bestellingen, aanvragen en contact komen hier binnen
   siteUrl: "https://outrunstore.github.io/",
-  lowStock: 2                        // vanaf dit aantal of minder: "Bijna op"
+  lowStock: 2,                       // vanaf dit aantal of minder: "Bijna op"
+  shippingCost: 4.95,                // verzendkosten in euro's
+  freeShippingFrom: 100,             // gratis verzending vanaf dit bedrag (0 = nooit gratis)
+  pickupPlace: "Leiden"              // ophalen is gratis; leeg laten ("") = geen ophaaloptie
 };
 
 /* Producten
@@ -170,5 +173,21 @@ const LOOKS = [
 ];
 /* ========================================= */
 
-/* thema meteen zetten, voordat de pagina tekent */
-try { const t = localStorage.getItem("outrun-theme"); if (t) document.documentElement.dataset.theme = t; } catch(e){}
+/* thema en intro meteen zetten, voordat de pagina tekent */
+(() => {
+  const root = document.documentElement;
+  root.classList.add("js");
+  try { const t = localStorage.getItem("outrun-theme"); if (t) root.dataset.theme = t; } catch(e){}
+  /* startanimatie alleen bij het eerste bezoek per sessie */
+  let seen = true;
+  try { seen = sessionStorage.getItem("outrun-intro") === "1"; } catch(e){}
+  const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!calm) {
+    root.classList.add("motion");
+    setTimeout(() => root.classList.add("is-ready"), 4000); /* vangnet als motion.js niet laadt */
+  }
+  if (!seen && !calm) {
+    root.classList.add("intro-pending");
+    setTimeout(() => root.classList.remove("intro-pending"), 4000); /* vangnet */
+  }
+})();

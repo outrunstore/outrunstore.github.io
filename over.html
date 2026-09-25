@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Over OUTRUN: een eigen streetwear-label met kleine drops en eerlijke prijzen.">
 <title>Over ons · OUTRUN Store</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23101114'/%3E%3Ctext x='33' y='47' font-family='Arial Black,Arial' font-weight='900' font-style='italic' font-size='42' text-anchor='middle' fill='%232436F5'%3EO%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Archivo:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
@@ -35,7 +36,7 @@
       <div class="prose">
         <p>OUTRUN is begonnen met een simpele vraag: waarom moet een goede puffer of een zware hoodie zoveel kosten? Het antwoord is vaak het logo. Dat laten wij weg.</p>
         <p>We brengen items uit in kleine drops. Dat houdt de prijs laag en zorgt ervoor dat niet iedereen op straat hetzelfde draagt. Op is op: is iets uitverkocht, dan is het weg, tenzij er genoeg vraag is voor een restock.</p>
-        <p>Bestellen gaat via Snapchat. Zo praat je direct met ons, krijg je eerlijk maatadvies en weet je zeker dat je item echt op voorraad is.</p>
+        <p>Bestellen doe je gewoon hier op de site. Je ziet precies welke maten er nog zijn, rekent af met iDEAL en hebt je bestelling binnen 1-2 werkdagen in huis.</p>
       </div>
     </div>
   </section>
@@ -44,13 +45,13 @@
     <div class="wrap values">
       <div class="value"><b>01</b><h3>Kleine drops</h3><p>Beperkte aantallen per item. Daardoor blijft het exclusief en verspillen we niks.</p></div>
       <div class="value"><b>02</b><h3>Eerlijke prijs</h3><p>Je betaalt voor de kwaliteit en de fit, niet voor een merknaam.</p></div>
-      <div class="value"><b>03</b><h3>Direct contact</h3><p>Geen klantenservice-bots in de wacht. Snap ons en je praat met ons.</p></div>
+      <div class="value"><b>03</b><h3>Direct contact</h3><p>Vragen? Mail ons of vraag het aan onze chatbot. Een mail beantwoorden we altijd zelf.</p></div>
     </div>
   </section>
 
   <section class="section" style="padding-top:0">
     <div class="wrap">
-      <a class="banner" href="shop.html" style="text-decoration:none;min-height:320px">
+      <a class="banner" href="shop.html" style="text-decoration:none;min-height:320px" data-cursor="Shop">
         <img src="img/core-zand.jpg" alt="" loading="lazy" style="object-position:center 30%">
         <div class="banner-body">
           <div class="eyebrow" id="dropLabel"></div>
@@ -67,6 +68,7 @@
 
 <script src="assets/site.js"></script>
 <script>$("dropLabel").textContent = CONFIG.dropName + (CONFIG.dropLive ? " is live" : " komt eraan");</script>
+<script src="assets/motion.js"></script>
 <script src="assets/chatbot.js"></script>
 </body>
 </html>

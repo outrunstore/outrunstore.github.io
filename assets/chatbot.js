@@ -22,6 +22,8 @@
   const fab = $("cbFab"), panel = $("cbPanel"), log = $("cbLog"), chipsEl = $("cbChips"), form = $("cbForm"), input = $("cbInput");
   const snap = CONFIG.snapUsername, mail = CONFIG.email;
   const snapLink = `<a href="${snapUrl}" target="_blank" rel="noopener">${snap}</a>`;
+  const mailLink = `<a href="mailto:${mail}">${mail}</a>`;
+  const shipText = () => `Verzenden kost ${euro(CONFIG.shippingCost)}` + (CONFIG.freeShippingFrom ? `, gratis vanaf ${euro(CONFIG.freeShippingFrom)}` : "");
   const DEFAULT_CHIPS = ["Welke maat past mij?", "Wat is uitverkocht?", "Prijzen", "Hoe bestel ik?", "Iets aanvragen"];
 
   const norm = s => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -57,7 +59,7 @@
 
   const link = p => `<a href="${productUrl(p)}">${esc(p.name)}</a>`;
   function stockLine(p){
-    if (p.soon) return `• ${link(p)}: binnenkort, snap om te reserveren`;
+    if (p.soon) return `• ${link(p)}: binnenkort binnen`;
     if (isSoldOut(p)) return `• ${link(p)}: helemaal uitverkocht`;
     const parts = p.colors.map(c => {
       const free = Object.keys(c.stock).filter(s => c.stock[s] > 0);
@@ -74,7 +76,7 @@
     if (cm < 178) return "M";
     if (cm < 184) return "L";
     if (cm <= 190) return "XL";
-    return "XL (bij ruim 1,90 m raden we je aan even te snappen, dan checken we de lengte)";
+    return "XL (bij ruim 1,90 m raden we je aan ons even te mailen, dan checken we de lengte)";
   }
 
   function answer(raw){
@@ -85,7 +87,7 @@
     const cm = (t.match(/\b(1[4-9]\d|20\d)\b/) || [])[1];
     const brand = BRANDS.find(b => t.includes(b));
 
-    if (brand) return { text: `Andere merken verkopen we niet, bro. Alleen ons eigen label OUTRUN. Maar gooi een foto in het <a href="aanvragen.html">aanvraagformulier</a> of snap ${snapLink}, dan zoeken we iets in dezelfde vibe.`, chips: ["Naar aanvraagformulier", "Bekijk de collectie"] };
+    if (brand) return { text: `Andere merken verkopen we niet, bro. Alleen ons eigen label OUTRUN. Maar gooi een foto in het <a href="aanvragen.html">aanvraagformulier</a>, dan zoeken we iets in dezelfde vibe.`, chips: ["Naar aanvraagformulier", "Bekijk de collectie"] };
 
     const intents = {
       greet:   has(t, [" hoi ", " hallo ", " hey ", " hi ", " yo ", " salam", " goedemiddag", " goedemorgen", " goedenavond", " hee ", " ewa", " wollah", " wsg", " alles goed"]),
@@ -93,10 +95,10 @@
       stock:   has(t, ["voorraad", "uitverkocht", "op is op", "nog", "beschikbaar", "restock", "leverbaar", "sold out"]) * 2,
       size:    has(t, ["maat", "maten", "size", "past", "valt", "groot", "klein", "lengte", " cm", "oversized"]) + (cm ? 2 : 0),
       price:   has(t, ["prijs", "prijzen", "kost", "kosten", "hoeveel", "duur", "goedkoop", "euro", "sale", "korting", "aanbieding"]),
-      ship:    has(t, ["verzend", "verzending", "bezorg", "lever", "postnl", "opsturen", "hoe lang", "wanneer binnen", "track"]),
+      ship:    has(t, ["verzend", "verzending", "verzendkosten", "bezorg", "lever", "postnl", "opsturen", "hoe lang", "wanneer binnen", "track"]),
       pickup:  has(t, ["ophalen", "afhalen", "leiden", "langskomen", "oppikken", "halen"]),
       pay:     has(t, ["betaal", "betalen", "tikkie", "ideal", "betaling", " pin", "contant", "cash"]),
-      order:   has(t, ["bestel", "bestellen", "kopen", "koop", "reserveer", "reserveren", "hoe werkt"]),
+      order:   has(t, ["bestel", "bestellen", "kopen", "koop", "reserveer", "reserveren", "hoe werkt", "winkelmand", "afrekenen", "checkout"]),
       request: has(t, ["aanvraag", "aanvragen", "zoek", "andere kleur", "heb je ook", "hebben jullie ook", "kunnen jullie", "regelen", "speciaal"]),
       drop:    has(t, ["drop", "nieuw", "binnenkort", "wanneer", "live"]),
       returns: has(t, ["retour", "ruilen", "terugsturen", "omruilen", "geld terug"]),
@@ -124,7 +126,7 @@
         return { text: "Hoe lang ben je? Typ bijv. \"ik ben 180\", dan fix ik je maat.\n\nS = 165-172 cm\nM = 172-178 cm\nL = 178-184 cm\nXL = 184-190 cm\n\nAlles valt oversized.", chips: ["Ik ben 175", "Ik ben 182", "Maattabel"] };
       }
       case "stock": {
-        if (prods.length) return { text: `Dit is er nog:\n${prods.map(stockLine).join("\n")}\n\nIets uitverkocht? Snap ${snapLink}, dan zetten we je op de lijst voor een restock.`, chips: ["Welke maat past mij?", "Hoe bestel ik?"] };
+        if (prods.length) return { text: `Dit is er nog:\n${prods.map(stockLine).join("\n")}\n\nIets uitverkocht? Klik op de productpagina op "laat het me weten bij restock", dan hoor je het als eerste.`, chips: ["Welke maat past mij?", "Hoe bestel ik?"] };
         const out = PRODUCTS.filter(isSoldOut), low = PRODUCTS.filter(isLow);
         return { text: `Helemaal uitverkocht:\n${out.map(p => "• " + link(p)).join("\n")}` + (low.length ? `\n\nBijna op, wees er fissa bij:\n${low.map(p => "• " + link(p)).join("\n")}` : "") + `\n\nVraag naar een specifiek item voor maten en kleuren, bijv. "is de core hoodie er nog in L?"`, chips: ["Bekijk de collectie", "Iets aanvragen"] };
       }
@@ -132,27 +134,27 @@
       case "product":
       case "catalog": {
         if (!prods.length && has(t, ["sale", "korting", "aanbieding"])) prods = PRODUCTS.filter(p => p.was);
-        if (prods.length) return { text: prods.map(priceLine).join("\n") + `\n\nWil je iets hebben? Snap ${snapLink} met je item, kleur en maat.`, chips: ["Wat is uitverkocht?", "Welke maat past mij?", "Hoe bestel ik?"] };
+        if (prods.length) return { text: prods.map(priceLine).join("\n") + `\n\nKlik op een item, kies je maat en gooi 'm in je winkelmand.`, chips: ["Wat is uitverkocht?", "Welke maat past mij?", "Hoe bestel ik?"] };
         const lines = CATS.map(c => {
           const ps = PRODUCTS.filter(p => p.cat === c).map(p => p.price);
           return `• <a href="shop.html?cat=${encodeURIComponent(c)}">${c}</a>: ${Math.min(...ps) === Math.max(...ps) ? euro(ps[0]) : euro(Math.min(...ps)) + " - " + euro(Math.max(...ps))}`;
         });
         return { text: `Dit zit er in ${CONFIG.dropName}:\n${lines.join("\n")}\n\nVraag naar een item voor de exacte prijs, bijv. "wat kost de nightrun puffer?"`, chips: ["Wat is uitverkocht?", "Hoe bestel ik?", "Bekijk de collectie"] };
       }
-      case "ship":   return { text: "We sturen door heel NL met PostNL + track & trace. Binnen 1-2 werkdagen na betaling heb je 't binnen.", chips: ["Ophalen", "Betalen", "Hoe bestel ik?"] };
-      case "pickup": return { text: `Zit je in de buurt van Leiden? Dan kun je 't ook gewoon ophalen. Snap ${snapLink} ff om een tijd en plek te regelen.`, chips: ["Hoe bestel ik?", "Verzending"] };
-      case "pay":    return { text: "Betalen gaat via Tikkie. Eerst betalen, dan sturen we 't op. Binnen 24 uur niet betaald? Dan gaat je item terug in de voorraad.", chips: ["Hoe bestel ik?", "Verzending"] };
-      case "order":  return { text: `Bestellen gaat simpel via Snap:\n1. Kies je item, kleur en maat op de site.\n2. Klik op "Kopieer bestelling" en stuur 'm naar ${snapLink}.\n3. Je krijgt een Tikkie. Na betaling ligt 't binnen 1-2 werkdagen bij je.`, chips: ["Bekijk de collectie", "Betalen", "Welke maat past mij?"] };
-      case "request":return { text: `Staat 't er niet tussen? Vul het <a href="aanvragen.html">aanvraagformulier</a> in, met foto erbij als je hebt. Wij zoeken 't voor je en laten je de prijs weten. Of snap ${snapLink}.`, chips: ["Naar aanvraagformulier", "Prijzen"] };
+      case "ship":   return { text: `We sturen door heel NL met PostNL + track & trace. Binnen 1-2 werkdagen na betaling heb je 't binnen. ${shipText()}.`, chips: ["Ophalen", "Betalen", "Hoe bestel ik?"] };
+      case "pickup": return { text: `Zit je in de buurt van ${CONFIG.pickupPlace || "Leiden"}? Kies bij het afrekenen voor ophalen, dat is gratis. We mailen je dan een tijd en plek.`, chips: ["Hoe bestel ik?", "Verzending"] };
+      case "pay":    return { text: "Betalen gaat met iDEAL. Na je bestelling krijg je binnen 24 uur een betaalverzoek per mail. Eerst betalen, dan sturen we 't op. Binnen 24 uur niet betaald? Dan gaat je item terug in de voorraad.", chips: ["Hoe bestel ik?", "Verzending"] };
+      case "order":  return { text: `Bestellen gaat gewoon hier op de site:\n1. Kies je item, kleur en maat en klik op "In winkelmand".\n2. Open je winkelmand en klik op "Afrekenen".\n3. Je krijgt een iDEAL-betaalverzoek. Na betaling ligt 't binnen 1-2 werkdagen bij je.`, chips: ["Bekijk de collectie", "Betalen", "Welke maat past mij?"] };
+      case "request":return { text: `Staat 't er niet tussen? Vul het <a href="aanvragen.html">aanvraagformulier</a> in, met foto erbij als je hebt. Wij zoeken 't voor je en laten je de prijs weten.`, chips: ["Naar aanvraagformulier", "Prijzen"] };
       case "drop": {
         const fresh = PRODUCTS.filter(p => p.isNew), soon = PRODUCTS.filter(p => p.soon);
-        return { text: (CONFIG.dropLive ? `${CONFIG.dropName} is live! Op is op, dus wees er fissa bij.` : `${CONFIG.dropName} komt eraan. Snap ${snapLink} om te reserveren.`) + (fresh.length ? `\n\nNieuw binnen:\n${fresh.map(p => "• " + link(p)).join("\n")}` : "") + (soon.length ? `\n\nBinnenkort:\n${soon.map(p => "• " + link(p)).join("\n")}` : ""), chips: ["Bekijk de collectie", "Wat is uitverkocht?"] };
+        return { text: (CONFIG.dropLive ? `${CONFIG.dropName} is live! Op is op, dus wees er fissa bij.` : `${CONFIG.dropName} komt eraan. Houd de site in de gaten!`) + (fresh.length ? `\n\nNieuw binnen:\n${fresh.map(p => "• " + link(p)).join("\n")}` : "") + (soon.length ? `\n\nBinnenkort:\n${soon.map(p => "• " + link(p)).join("\n")}` : ""), chips: ["Bekijk de collectie", "Wat is uitverkocht?"] };
       }
-      case "returns":return { text: `Wil je iets ruilen of terugsturen? Snap ${snapLink} ff, dan fixen we 't samen.`, chips: ["Hoe bestel ik?", "Welke maat past mij?"] };
-      case "human":  return { text: `Snap ons direct: ${snapLink}. Of mail naar ${mail}.`, chips: ["Hoe bestel ik?", "Iets aanvragen"] };
+      case "returns":return { text: `Wil je iets ruilen of terugsturen? Mail ${mailLink} met je bestelnummer, dan fixen we 't samen.`, chips: ["Hoe bestel ik?", "Welke maat past mij?"] };
+      case "human":  return { text: `Mail ons op ${mailLink}, of stuur een snap naar ${snapLink}.`, chips: ["Hoe bestel ik?", "Iets aanvragen"] };
       case "thanks": return { text: "Geen probleem, bro! Nog iets?", chips: DEFAULT_CHIPS };
       case "greet":  return { text: "Yo! Alles goed? Waar kan ik je mee helpen?", chips: DEFAULT_CHIPS };
-      default:       return { text: `Hmm, daar heb ik geen antwoord op. Snap ${snapLink} ff, dan helpen we je persoonlijk.`, chips: DEFAULT_CHIPS };
+      default:       return { text: `Hmm, daar heb ik geen antwoord op. Mail ${mailLink} ff, dan helpen we je persoonlijk.`, chips: DEFAULT_CHIPS };
     }
   }
 
